@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.IO;
 
@@ -18,7 +18,20 @@ public class CooSystem : MonoBehaviour {
 	public Vector3 G58_pos = new Vector3(0,0,0);
 	public Vector3 G59_pos = new Vector3(0,0,0);
 	public Vector3 workpiece_coo = new Vector3(0,0,0);
-
+	
+	//设定界面修改---陈振华---03.11
+	public string parameter = "0";
+	public string TV = "0";
+	public string CKJC = "0";
+	public string input_unit = "0";
+	public string IO = "0";
+	public string order = "0";
+	public string zhidai = "0";
+	public string order_stop1 = "0";
+	public string order_stop2 = "0";
+	public bool show_result = false;
+	//设定界面修改---陈振华---03.11
+	
 	void Awake () {
 		
 	}
@@ -30,8 +43,261 @@ public class CooSystem : MonoBehaviour {
 		ReadCooFile();
 		workpiece_coo = G54_pos;
 		workpiece_flag = 1;
+		
+		//设定界面修改---陈振华---03.11
+		parameter = PlayerPrefs.GetString("parameter");
+        TV = PlayerPrefs.GetString("TV");
+	    CKJC = PlayerPrefs.GetString("CKJC");
+	    input_unit = PlayerPrefs.GetString("input_unit");
+	    IO = PlayerPrefs.GetString("IO");
+	    order = PlayerPrefs.GetString("order");
+	    zhidai = PlayerPrefs.GetString("zhidai");
+	    order_stop1 = PlayerPrefs.GetString("order_stop1");
+	    order_stop2 = PlayerPrefs.GetString("order_stop2");
 	}
 	
+	//设定界面下移
+	public void argu_down()
+	{
+		switch(ControlPanel_script.argu_setting)
+		{
+		case 1:
+		ControlPanel_script.argu_setting = 2;
+			//Debug.Log("can run");
+		ArguCursorPos();
+		break;
+		case 2:
+		ControlPanel_script.argu_setting = 3;
+		ArguCursorPos();
+		break;
+		case 3:
+		ControlPanel_script.argu_setting = 4;
+		ArguCursorPos();
+		break;
+		case 4:
+		ControlPanel_script.argu_setting = 5;
+		ArguCursorPos();
+		break;
+		case 5:
+		ControlPanel_script.argu_setting = 6;
+		ArguCursorPos();
+		break;
+		case 6:
+		ControlPanel_script.argu_setting = 7;
+		ArguCursorPos();
+		break;
+		case 7:
+		ControlPanel_script.argu_setting = 8;
+		ArguCursorPos();
+		break;
+		case 8:
+		ControlPanel_script.argu_setting = 9;
+		ArguCursorPos();
+		break;
+		}
+	}
+	
+		//设定界面上移
+	public void argu_up()
+	{
+		switch(ControlPanel_script.argu_setting)
+		{
+		case 9:
+		ControlPanel_script.argu_setting = 8;
+		ArguCursorPos();
+		break;
+		case 8:
+		ControlPanel_script.argu_setting = 7;
+		ArguCursorPos();
+		break;
+		case 7:
+		ControlPanel_script.argu_setting = 6;
+		ArguCursorPos();
+		break;
+		case 6:
+		ControlPanel_script.argu_setting = 5;
+		ArguCursorPos();
+		break;
+		case 5:
+		ControlPanel_script.argu_setting = 4;
+		ArguCursorPos();
+		break;
+		case 4:
+		ControlPanel_script.argu_setting = 3;
+		ArguCursorPos();
+		break;
+		case 3:
+		ControlPanel_script.argu_setting = 2;
+		ArguCursorPos();
+		break;
+		case 2:
+		ControlPanel_script.argu_setting = 1;
+		ArguCursorPos();
+		break;
+		}
+	}
+	
+	//黄色背景位置
+	public void ArguCursorPos()
+	{
+		switch(ControlPanel_script.argu_setting)
+		{
+		case 1:
+	    ControlPanel_script.argu_setting_cursor_y = 61.5f;
+		ControlPanel_script.argu_setting_cursor_w = 16f;
+			break;
+		case 2:
+		ControlPanel_script.argu_setting_cursor_y = 92f;
+		ControlPanel_script.argu_setting_cursor_w = 16f;
+			break;
+		case 3:
+		ControlPanel_script.argu_setting_cursor_y = 121.5f;
+		ControlPanel_script.argu_setting_cursor_w = 16f;
+			break;
+		case 4:
+		ControlPanel_script.argu_setting_cursor_y = 152f;
+		ControlPanel_script.argu_setting_cursor_w = 16f;
+			break;
+		case 5:
+		ControlPanel_script.argu_setting_cursor_y = 181.5f;
+		ControlPanel_script.argu_setting_cursor_w = 36f;
+			break;
+		case 6:
+		ControlPanel_script.argu_setting_cursor_y = 212f;
+		ControlPanel_script.argu_setting_cursor_w = 16f;
+			break;
+		case 7:
+		ControlPanel_script.argu_setting_cursor_y = 241.5f;
+		ControlPanel_script.argu_setting_cursor_w = 16f;
+			break;
+		case 8:
+		ControlPanel_script.argu_setting_cursor_y = 272f;
+		ControlPanel_script.argu_setting_cursor_w = 117f;
+			break;
+		case 9:
+		ControlPanel_script.argu_setting_cursor_y = 301.5f;
+		ControlPanel_script.argu_setting_cursor_w = 117f;
+			break;
+		}
+	}
+	
+	public void set_parameter(string input)
+	{
+		//Debug.Log(input);
+		switch (ControlPanel_script.argu_setting)
+		{
+		case 1:
+			if( input == "0" || input=="1")
+			{
+			PlayerPrefs.SetString("parameter", input);
+		    parameter = PlayerPrefs.GetString("parameter");
+			//Debug.Log(parameter);
+			}
+			else
+			{
+				Debug.Log("请输入0或1");
+				return;
+			}
+			break;
+		case 2:
+		    if( input == "0" || input=="1")
+			{
+			PlayerPrefs.SetString("TV", input);
+			TV = PlayerPrefs.GetString("TV");
+			//Debug.Log(TV);
+			}
+			else
+			{
+				Debug.Log("请输入0或1");
+				return;
+			}
+			break;
+		case 3:
+			if( input == "0" || input=="1")
+			{
+			PlayerPrefs.SetString("CKJC", input);
+			CKJC = PlayerPrefs.GetString("CKJC");
+			//Debug.Log(CKJC);
+			}
+			else
+			{
+				Debug.Log("请输入0或1");
+				return;
+			}
+			break;
+		case 4:
+			if( input == "0" || input=="1")
+			{
+			PlayerPrefs.SetString("input_unit", input);
+			input_unit = PlayerPrefs.GetString("input_unit");
+			//Debug.Log(input_unit);
+			}
+			else
+			{
+				Debug.Log("请输入0或1");
+				return;
+			}
+			break;
+		case 5:
+			if( input == "0" || input=="1" || input=="2" || input=="3"|| input=="4"|| input=="5"|| input=="6"|| input=="7"|| input=="8"|| input=="9"
+				|| input=="10"|| input=="11"|| input=="12"|| input=="13"|| input=="14"|| input=="15"|| input=="16"|| input=="17"|| input=="18"|| input=="19"
+				|| input=="20"|| input=="21"|| input=="22"|| input=="23"|| input=="24"|| input=="25"|| input=="26"|| input=="27"|| input=="28"|| input=="29"
+				|| input=="30"|| input=="31"|| input=="32"|| input=="33"|| input=="34"|| input=="35")
+			{
+			PlayerPrefs.SetString("IO", input);
+			IO = PlayerPrefs.GetString("IO");
+			//Debug.Log(IO);
+			}
+			else
+			{
+				Debug.Log("请输入0~35");
+				return;
+			}
+			break;
+		case 6:
+			if( input == "0" || input=="1")
+			{
+			PlayerPrefs.SetString("order", input);
+			order= PlayerPrefs.GetString("order");
+			//Debug.Log(order);
+			}
+			else
+			{
+				Debug.Log("请输入0或1");
+				return;
+			}
+			break;
+		case 7:
+			if( input == "0" || input=="1")
+			{
+			PlayerPrefs.SetString("zhidai", input);
+			zhidai = PlayerPrefs.GetString("zhidai");
+			//Debug.Log(zhidai);
+			}
+			else
+			{
+				Debug.Log("请输入0或1");
+				return;
+			}
+			break;
+		case 8:
+			PlayerPrefs.SetString("order_stop1", input);
+			order_stop1 = PlayerPrefs.GetString("order_stop1");
+			//Debug.Log(order_stop1);
+			break;
+		case 9:
+			PlayerPrefs.SetString("order_stop2", input);
+			order_stop2 = PlayerPrefs.GetString("order_stop2");
+			//Debug.Log(order_stop2);
+			break;
+		default:
+			Debug.Log("out of range");
+			break;
+		}
+		
+	}
+	
+	//参数界面内容
 	public void ReadCooFile () 
 	{
 		string line_str = "";

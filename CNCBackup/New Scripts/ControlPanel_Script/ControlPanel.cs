@@ -302,6 +302,13 @@ public class ControlPanel : MonoBehaviour {
 	Rect power_notifi_window = new Rect(Screen.width / 2f, Screen.height / 2f, 200f, 100f); 
 	public float move_rate = 1f;
 	
+	//设定界面修改---陈振华---03.11
+	public GUIStyle sty_OffSet_Coo_mini;
+	public GUIStyle sty_OffSet_Coo_mid;
+	public float argu_setting_cursor_y = 61.5f;
+	public float argu_setting_cursor_w = 16f;
+	public int argu_setting = 1;
+	//设定界面修改---陈振华---03.11
 	
 	void Awake () 
 	{
@@ -724,6 +731,11 @@ public class ControlPanel : MonoBehaviour {
 		coo_setting_2 = 1;
 		
 		sty_SettingsBG.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/SettingsBG");
+		
+		//设定界面修改---陈振华---03.11
+		sty_OffSet_Coo_mini.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/offset_coo_mini");
+		sty_OffSet_Coo_mid.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/offset_coo_mid");
+		//设定界面修改---陈振华---03.11
 	}
 	
 	void OnGUI()
@@ -1591,6 +1603,28 @@ public class ControlPanel : MonoBehaviour {
 	{
 		yield return new WaitForSeconds(0.3f);
 		ScreenCover = false;	
+	}
+	
+	//设定界面修改---陈振华---03.11
+	//使设定输入右对齐
+	public string ArguStringGet(string StrValue)
+	{
+		string DisplayStr = "";
+		if(StrValue.Length == 1)
+		DisplayStr = "       "+StrValue;
+		else if(StrValue.Length == 2)
+		DisplayStr = "      "+StrValue;
+		else if(StrValue.Length == 3)
+		DisplayStr = "     "+StrValue;
+		else if(StrValue.Length == 4)
+		DisplayStr = "    "+StrValue;
+		else if(StrValue.Length == 5)
+		DisplayStr = "   "+StrValue;
+		else if(StrValue.Length == 6)
+		DisplayStr = "  "+StrValue;
+		else if(StrValue.Length == 7)
+		DisplayStr = " "+StrValue;
+		return DisplayStr;	
 	}
 
 

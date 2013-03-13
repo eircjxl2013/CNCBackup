@@ -105,6 +105,14 @@ public class SoftkeyModule : MonoBehaviour {
 					Main.OffSetOne = true;
 				}
 			}
+			if(Main.OffSetSetting)
+			{
+				if(Main.OffSetTwo)
+				{
+					Main.OffSetTwo = false;
+					Main.OffSetOne = true;
+				}
+			}
 			if(Main.OffSetCoo)
 			{
 				if(Main.OffSetTwo)
@@ -699,6 +707,14 @@ public class SoftkeyModule : MonoBehaviour {
 		if(Main.SettingMenu)
 		{
 			if(Main.OffSetTool)
+			{
+				if(Main.OffSetOne)
+				{
+					Main.OffSetTwo = true;
+					Main.OffSetOne = false;
+				}
+			}
+			if(Main.OffSetSetting)
 			{
 				if(Main.OffSetOne)
 				{

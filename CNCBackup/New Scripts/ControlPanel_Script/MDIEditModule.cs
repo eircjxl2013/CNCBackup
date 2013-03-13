@@ -2348,6 +2348,11 @@ public class MDIEditModule : MonoBehaviour {
 			{
 				
 			}
+			//设定界面上移
+			if(Main.OffSetSetting)
+			{
+				CooSystem_script.argu_up();
+			}
 			if(Main.OffSetCoo)
 			{
 				CooSystem_script.Up();
@@ -2487,6 +2492,11 @@ public class MDIEditModule : MonoBehaviour {
 			if(Main.OffSetTool)
 			{
 				
+			}
+			//设定界面下移
+			if(Main.OffSetSetting)
+			{
+				CooSystem_script.argu_down();
 			}
 			if(Main.OffSetCoo)
 			{
