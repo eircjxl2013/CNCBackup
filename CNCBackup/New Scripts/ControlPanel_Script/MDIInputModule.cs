@@ -4,6 +4,14 @@ using System.Collections;
 public class MDIInputModule : MonoBehaviour {
 	ControlPanel Main;
 	CooSystem CooSystem_script;
+	//位置界面功能完善---宋荣 ---03.09
+	public bool isXSelected;//相对或综合pos下X键是否按下；
+	public bool isYSelected;
+	public bool isZSelected;
+	//位置界面功能完善---宋荣 ---03.09
+	
+	
+	
 	// Use this for initialization
 	void Start () {
 		Main = gameObject.GetComponent<ControlPanel>();
@@ -292,6 +300,66 @@ public class MDIInputModule : MonoBehaviour {
 				Main.ProgEDITCusorPos =57f + Main.InputTextSize.x;
 			}
 		}	
+		
+		//位置界面功能完善---宋荣 ---03.09
+		if(Main.PosMenu)
+		{
+			if(!Main.ShiftFlag&&without_shift=="X"&&((Main.RelativeCoo||Main.GeneralCoo)||(Main.operationBottomScrInitial&&(Main.statusBeforeOperation==2||Main.statusBeforeOperation==3))))
+			{
+				isXSelected=true;
+				Main.operationBottomScrInitial=true;
+				Main.operationBottomScrExecute=false;
+				Main.posOperationMode=true;
+				if(Main.RelativeCoo)
+					Main.statusBeforeOperation=2;
+				if(Main.AbsoluteCoo)
+					Main.statusBeforeOperation=1;
+				if(Main.GeneralCoo)
+					Main.statusBeforeOperation=3;
+				Main.RelativeCoo=false;
+				Main.AbsoluteCoo=false;
+				Main.GeneralCoo=false;
+				isYSelected=false;
+				isZSelected=false;
+			}
+			if(!Main.ShiftFlag&&without_shift=="Y"&&((Main.RelativeCoo||Main.GeneralCoo)||(Main.operationBottomScrInitial&&(Main.statusBeforeOperation==2||Main.statusBeforeOperation==3))))
+			{
+				isYSelected=true;
+				Main.operationBottomScrInitial=true;
+				Main.operationBottomScrExecute=false;
+				Main.posOperationMode=true;
+				if(Main.RelativeCoo)
+					Main.statusBeforeOperation=2;
+				if(Main.AbsoluteCoo)
+					Main.statusBeforeOperation=1;
+				if(Main.GeneralCoo)
+					Main.statusBeforeOperation=3;
+				Main.RelativeCoo=false;
+				Main.AbsoluteCoo=false;
+				Main.GeneralCoo=false;
+				isXSelected=false;
+				isZSelected=false;
+			}
+			if(!Main.ShiftFlag&&without_shift=="Z"&&((Main.RelativeCoo||Main.GeneralCoo)||(Main.operationBottomScrInitial&&(Main.statusBeforeOperation==2||Main.statusBeforeOperation==3))))
+			{
+				isZSelected=true;
+				Main.operationBottomScrInitial=true;
+				Main.operationBottomScrExecute=false;
+				Main.posOperationMode=true;
+				if(Main.RelativeCoo)
+					Main.statusBeforeOperation=2;
+				if(Main.AbsoluteCoo)
+					Main.statusBeforeOperation=1;
+				if(Main.GeneralCoo)
+					Main.statusBeforeOperation=3;
+				Main.RelativeCoo=false;
+				Main.AbsoluteCoo=false;
+				Main.GeneralCoo=false;
+				isYSelected=false;
+				isXSelected=false;
+			}
+		}
+	    //位置界面功能完善---宋荣 ---03.09
 	}
 	
 	// Update is called once per frame

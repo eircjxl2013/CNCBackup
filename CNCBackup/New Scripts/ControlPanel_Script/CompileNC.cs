@@ -1,10 +1,13 @@
+#region Using directives
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+#endregion
 
 public class CompileNC : MonoBehaviour 
 {
+	#region Defined variable
 	CooSystem CooSystem_script;
 	MoveControl MoveControl_script;
 	public List<CodeClass> motionCode = new List<CodeClass>();
@@ -16,9 +19,11 @@ public class CompileNC : MonoBehaviour
 	Vector3 coo_ext = new Vector3(0,0,0);
 	Vector3 coo_workpiece = new Vector3(0,0,0);
 	float G00_Move_speed = 0.10201f;
+	#endregion
 	
 	void Awake () 
 	{
+		
 	}
 	
 	void Start ()

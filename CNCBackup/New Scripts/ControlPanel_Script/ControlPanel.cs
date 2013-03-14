@@ -310,6 +310,15 @@ public class ControlPanel : MonoBehaviour {
 	public int argu_setting = 1;
 	//设定界面修改---陈振华---03.11
 	
+	//位置界面功能完善---宋荣 ---03.09
+	public bool operationBottomScrInitial=false;//position模式下按下操作键的初始界面显示标志
+	public bool operationBottomScrExecute=false;//position模式下按下执行界面显示标志
+	public bool partsNumBlink=false;//零件数闪烁标志
+	public bool runtimeIsBlink=false;//运行时间闪烁标志
+	public bool posOperationMode=false;//position下按下操作键,用来屏蔽第一、二、三个按钮的操作。
+	public int statusBeforeOperation=-1;
+	//位置界面功能完善---宋荣 ---03.09
+	
 	void Awake () 
 	{
 		gameObject.AddComponent("PositionModule");
