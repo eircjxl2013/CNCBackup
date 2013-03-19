@@ -80,11 +80,12 @@ public class ProgramModule : MonoBehaviour {
 			Main.sty_BottomButton_3.normal.background = Main.t2d_BottomButton_u;
 			Main.sty_BottomButton_4.normal.background = Main.t2d_BottomButton_u;
 			Main.sty_BottomButton_5.normal.background = Main.t2d_BottomButton_u;
-			GUI.Label(new Rect(62f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"后台编辑", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
+			GUI.Label(new Rect(72f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"BG编辑", Main.sty_BottomChooseMenu);//内容--将“后台”改为“BG”，姓名--刘旋，日期--2013-3-14
 			GUI.Label(new Rect(171f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"O检索", Main.sty_BottomChooseMenu);
 			GUI.Label(new Rect(261f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"检索↓", Main.sty_BottomChooseMenu);
 			GUI.Label(new Rect(352f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"检索↑", Main.sty_BottomChooseMenu);
-			GUI.Label(new Rect(430f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"REWIND", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(450f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"返回", Main.sty_BottomChooseMenu);//内容--将“REWIND”改为“返回”，姓名--刘旋，日期--2013-3-14
 			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
 		}
 		else if(Main.ProgEDITFlip == 2)
@@ -95,11 +96,11 @@ public class ProgramModule : MonoBehaviour {
 			Main.sty_BottomButton_4.normal.background = Main.t2d_BottomButton_u;
 			Main.sty_BottomButton_5.normal.background = Main.t2d_BottomButton_u;
 			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
-			GUI.Label(new Rect(80f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"F检索", Main.sty_BottomChooseMenu);
-			GUI.Label(new Rect(171f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"READ", Main.sty_BottomChooseMenu);
-			GUI.Label(new Rect(257f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"PUNCH", Main.sty_BottomChooseMenu);
-			GUI.Label(new Rect(340f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"DELETE", Main.sty_BottomChooseMenu);
-			GUI.Label(new Rect(432f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"EX-EDT", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(86f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"选择", Main.sty_BottomChooseMenu);//内容--将“F检索”改为“选择”，姓名--刘旋，日期--2013-3-14
+			GUI.Label(new Rect(165f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"全选择", Main.sty_BottomChooseMenu);//内容--将“READ”改为“全选择”，姓名--刘旋，日期--2013-3-14
+			//GUI.Label(new Rect(257f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"PUNCH", Main.sty_BottomChooseMenu);删除的内容，姓名--刘旋，日期--2013-3-14
+			//GUI.Label(new Rect(340f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"DELETE", Main.sty_BottomChooseMenu);删除的内容，姓名--刘旋，日期--2013-3-14
+			GUI.Label(new Rect(450f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"粘贴", Main.sty_BottomChooseMenu);//内容--将“EX-EDT”改为“粘贴”，姓名--刘旋，日期--2013-3-14
 			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
 		}
 		else if(Main.ProgEDITFlip == 3)
@@ -110,8 +111,56 @@ public class ProgramModule : MonoBehaviour {
 			Main.sty_BottomButton_4.normal.background = Main.t2d_BottomButton_u;
 			Main.sty_BottomButton_5.normal.background = Main.t2d_BottomButton_u;
 			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
-			GUI.Label(new Rect(165f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"C-EXT", Main.sty_BottomChooseMenu);
+			//内容--以下是增加或修改的程序编辑界面下，程序菜单底部按钮的不同文字显示功能
+			//姓名--刘旋
+			//日期--2013-3-14
+			
+			GUI.Label(new Rect(86f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"取消", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(171f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"~最后", Main.sty_BottomChooseMenu);//内容--将“C-EXT”改为“~最后”，姓名--刘旋，日期--2013-3-14
+			GUI.Label(new Rect(262f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"复制", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(352f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"切取", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(450f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"粘贴", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
+		
 		}
+		
+		else if(Main.ProgEDITFlip == 4)
+		{
+			Main.sty_BottomButton_2.normal.background = Main.t2d_BottomButton_u;
+			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
+			GUI.Label(new Rect(82f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"替换", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
+		
+		}
+		else if(Main.ProgEDITFlip == 5)
+		{
+			Main.sty_BottomButton_2.normal.background = Main.t2d_BottomButton_u;
+			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
+			GUI.Label(new Rect(86f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"取消", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(261f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"复制", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(352f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"切取", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(450f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"粘贴", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
+			
+		}
+		
+		else if(Main.ProgEDITFlip == 6)
+		{
+			Main.sty_BottomButton_2.normal.background = Main.t2d_BottomButton_u;
+			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
+			GUI.Label(new Rect(82f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"替换", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
+			
+		}
+		else if(Main.ProgEDITFlip == 7)
+		{
+			Main.sty_BottomButton_2.normal.background = Main.t2d_BottomButton_u;
+			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
+			GUI.Label(new Rect(66f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"BUF执行", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(158f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"指定PRG", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
+			
+		}//增加内容到此
 	}
 	
 	//编辑界面程序列表
