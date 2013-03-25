@@ -161,6 +161,17 @@ public class ProgramModule : MonoBehaviour {
 			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
 			
 		}//增加内容到此
+		else if(Main.ProgEDITFlip==8)
+		{
+			Main.sty_BottomButton_2.normal.background = Main.t2d_BottomButton_u;
+			GUI.Label(new Rect(44f/1000f*Main.width,423f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"<", Main.sty_MostWords);
+			GUI.Label(new Rect(86f/1000f*Main.width,420f/1000f*Main.height,100f/1000f*Main.width,25f/1000f*Main.height),"之前", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(176f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"之后", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(267f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"跳跃", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(346f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"1-执行", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(441f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"全执行", Main.sty_BottomChooseMenu);
+			GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
+		}
 	}
 	
 	//编辑界面程序列表

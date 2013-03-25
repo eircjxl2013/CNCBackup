@@ -144,6 +144,8 @@ public class SoftkeyModule : MonoBehaviour {
 				        Main.ProgEDITFlip=5;
 			        else if (Main.ProgEDITFlip==7)
 				        Main.ProgEDITFlip=2;//变化内容到此
+					else if(Main.ProgEDITFlip==8)
+						Main.ProgEDITFlip=4;
 				}
 				if(Main.ProgEDITList)
 				{
@@ -257,7 +259,9 @@ public class SoftkeyModule : MonoBehaviour {
 			       else if (Main.ProgEDITFlip==3)   
 				       Main.ProgEDITFlip=2;
 		           else if (Main.ProgEDITFlip==5)
-				       Main.ProgEDITFlip=2;	
+				       Main.ProgEDITFlip=2;
+					else if ((Main.ProgEDITFlip==6)||(Main.ProgEDITFlip==4))//内容--增加程序底部按钮显示“8”，用于实现“替换”功能，姓名--刘旋，时间--2013-3-20
+						Main.ProgEDITFlip=8;
 				}
 				if(Main.ProgEDITList)
 				{//变化的内容到此
@@ -350,6 +354,74 @@ public class SoftkeyModule : MonoBehaviour {
 						Main.ProgEDITList=true;
 						Main.ProgEDITProg=false ;
 					}	
+					//内容--打开一个程序后，按”O检索“直接打开下一个程序，当前显示程序如果是最后一个程序，则打开第一个程序
+					//姓名--刘旋，时间--2013-3-21
+					else if(Main.ProgEDITFlip==1)
+					{
+						if(Main.RealListNum<Main.TotalListNum)
+							Main.RealListNum++;
+						else if (Main.RealListNum==Main.TotalListNum)
+							Main.RealListNum=1;
+						if(Main.FileNameList[Main.RealListNum-1].ToCharArray()[0]=='O')
+						{
+							char[] temp_name=Main.FileNameList[Main.RealListNum-1].ToString().ToCharArray ();
+							bool normal_flag=false;
+							for (int q=0;q<temp_name.Length;q++)
+							{
+								if(temp_name[q]=='O'||(temp_name[q]>='0'&&temp_name[q]<='9'))
+								{
+									normal_flag=true;
+								    continue;
+								}
+								else
+								{
+									normal_flag=false;
+									break;
+								}
+							}
+							if(normal_flag)
+							{
+								Main.ProgramNum=Convert.ToInt32(Main.FileNameList[Main.RealListNum-1].Trim('O'));
+								Main.current_filenum=Main.RealListNum;
+								Main.current_filename=Main.FileNameList[Main.RealListNum-1].ToString();
+								Main.CodeForAll.Clear();
+								Main.RealCodeNum=1;
+								Main.HorizontalNum=1;
+								Main.VerticalNum=1;
+								String SLine="";
+								FileStream faceInfoFile;
+								FileInfo ExistCheck=new FileInfo(Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".txt");
+								if(ExistCheck.Exists)
+									faceInfoFile=new FileStream (Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".txt",FileMode.Open,FileAccess.Read);
+								else
+								{
+									ExistCheck=new FileInfo(Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".cnc");
+									if (ExistCheck.Exists)
+										faceInfoFile=new FileStream (Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".cnc",FileMode.Open,FileAccess.Read);
+									else
+										faceInfoFile=new FileStream (Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".nc",FileMode.Open,FileAccess.Read); 			
+								}
+								StreamReader sR=new StreamReader (faceInfoFile );
+								SLine=sR.ReadLine();
+								while(SLine!=null)
+								{
+									Main.CodeForAll.Add(SLine.ToUpper().Trim().Trim(';','；'));
+									SLine=sR.ReadLine();
+								}
+								sR.Close();
+								if(Main.CodeForAll[Main.CodeForAll.Count-1]=="")
+									Main.CodeForAll.RemoveAt(Main.CodeForAll.Count-1);
+								Main.TotalCodeNum=Main.CodeForAll.Count;
+								MDIEdit_Script.CodeEdit();
+								Main.ProgEDITCusorH=32f;
+								Main.ProgEDITCusorV=100f;
+								Main.EDITText.text=Main.TempCodeList[0][0];
+								Main.TextSize=Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
+							}
+							else Debug.Log("Program name is ilegal!");
+						}
+						else Debug.Log("Program name is ilegal!");//增加内容到此
+					}
 				}
 				if(Main.ProgEDITList)
 				{//变化内容到此
@@ -360,7 +432,7 @@ public class SoftkeyModule : MonoBehaviour {
 							Main.RealListNum = Main.current_filenum;
 						else
 							Main.RealListNum = 1;
-						Main.ProgEDITCusor = 175f;
+						//Main.ProgEDITCusor = 175f;
 						Main.FileNameList.Clear();
 						Main.FileSizeList.Clear();
 						Main.FileDateList.Clear();
@@ -375,7 +447,7 @@ public class SoftkeyModule : MonoBehaviour {
 						string[] TempNameArray = new string[8];
 						int[] TempSizeArray = new int[8];
 						string[] TempDateArray = new string[8];
-						int Eight = 0;
+						//int Eight = 0;
 						for(int i = 0; i < TempFileList.Length; i++)
 						{
 							FileTestExtension = new FileInfo(TempFileList[i]);
@@ -399,19 +471,59 @@ public class SoftkeyModule : MonoBehaviour {
 								if(normal_flag)
 								{
 									Main.FileNameList.Add(TempStrArray[0]);
-									Main.FileSizeList.Add((Int32)FileTestExtension.Length/1024);//内容--将文件大小的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
+									//内容--文件大小修改,0B转化为0K，1B-1024B转化为1K，1025B-2048B转化为2K。。。
+									//姓名--刘旋，时间--2013-3-21
+									int temp_num=0;
+									temp_num=(Int32)FileTestExtension.Length;	
+									if(temp_num>0)
+											temp_num=(temp_num+1023)/1024;		
+									Main.FileSizeList.Add(temp_num);
 									Main.ProgUsedNum++;
-									Main.ProgUsedSpace +=  (Int32)FileTestExtension.Length/1024;//内容--将已用内存的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
+									Main.ProgUsedSpace +=  temp_num;
 									Main.FileDateList.Add(FileTestExtension.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
 								}
 							}	
 						}
 						Main.TotalListNum = Main.FileNameList.Count;
-						int start_index = Main.RealListNum - 1;
-						if(Main.FileNameList.Count  - start_index >= 8)
-							Eight = start_index + 8;
-						else
-							Eight = Main.FileNameList.Count;
+						//内容--对于某一程序号，只在特定的位置显示
+						//姓名--刘旋，时间--2-13-3-21
+						int middle_num=0;
+						middle_num=Main.RealListNum%8;
+						switch(middle_num)
+						{
+							case 1:
+								Main.ProgEDITCusor =175f;
+								break;
+							case 2:
+								Main.ProgEDITCusor =195f;
+								break;
+							case 3:
+								Main.ProgEDITCusor =215f;
+								break;
+							case 4:
+								Main.ProgEDITCusor =235f;
+								break;
+							case 5:
+								Main.ProgEDITCusor =255f;
+								break;
+							case 6:
+								Main.ProgEDITCusor =275f;
+								break;
+							case 7:
+								Main.ProgEDITCusor =295f;
+								break;
+							case 0:
+								Main.ProgEDITCusor =315f;
+								break;	
+						}
+						//Main.ProgEDITAt=true;
+						int currentpage=(Main.RealListNum-1)/8;	
+						int startnum=currentpage*8+1;	
+						int finalnum=currentpage*8+8;
+						//增加内容到此
+						if(finalnum >Main.TotalListNum)				
+							finalnum=Main.TotalListNum;	
+
 						for(int i = 0; i < 8; i++)
 						{
 							TempNameArray[i] = "";
@@ -419,7 +531,7 @@ public class SoftkeyModule : MonoBehaviour {
 							TempDateArray[i] = "";
 						}
 						int array_index = -1;
-						for(int i = start_index; i < Eight; i++)
+						for(int i = startnum-1; i < finalnum; i++)
 						{
 							array_index++;
 							TempNameArray[array_index] = Main.FileNameList[i];
@@ -465,6 +577,139 @@ public class SoftkeyModule : MonoBehaviour {
 						//O检索
 						if(Main.ProgEDITList)
 						{
+							if ((Main.InputText.Length <6)&&(Main.InputText.Length>1))//内容--MDI键盘输入程序名称，按下“O检索”，实现对程序的选择，姓名--刘旋，时间--2013-3-20
+							{   
+								
+								if (Main.InputText[0]!='O')
+								{
+									Main.InputText="";
+									Main .ProgEDITCusorPos=57f;
+								}
+								
+								else 
+								{
+								char[] temp_name=Main.InputText.ToCharArray ();
+								bool normal_flag=true;
+								for(int j=0;j<temp_name.Length ;j++)
+								{
+									if(temp_name[j] == 'O' || (temp_name[j] >= '0' && temp_name[j] <= '9'))
+									    continue;
+								    else
+								       {
+									      normal_flag = false;
+									      break;
+								       }
+								}
+									if(normal_flag)
+									{
+										int inputname = Convert.ToInt32(Main.InputText.Trim('O'));
+										String tempinput_name=Main.ToolNumFormat(inputname);
+										String input_name='O'+tempinput_name;
+										int m=0;
+										while(input_name!=Main.FileNameList[m])
+									{
+										m++;
+									}
+									Main.RealListNum=m+1;
+									Main.ProgramNum = Convert.ToInt32(Main.FileNameList[Main.RealListNum - 1].Trim('O'));
+									if (Main.ProgEDITFlip==0)
+										Main.ProgEDITFlip=1;
+									//内容--对于某一程序号，只在特定的位置显示
+					               //姓名--刘旋，时间--2-13-3-21
+									int middle_num=0;
+									middle_num=Main.RealListNum%8;
+									switch(middle_num)
+									{
+									case 1:
+										Main.ProgEDITCusor=175f;
+										break;
+									case 2:
+										Main.ProgEDITCusor=195f;
+										break;
+									case 3:
+										Main.ProgEDITCusor=215f;
+										break;
+									case 4:
+										Main.ProgEDITCusor=235f;
+										break;
+									case 5:
+										Main.ProgEDITCusor=255f;
+										break;
+									case 6:
+										Main.ProgEDITCusor=275f;
+										break;
+									case 7:
+										Main.ProgEDITCusor=295f;
+										break;
+									case 0:
+										Main.ProgEDITCusor=315f;
+										break;
+											
+									}
+									Main.ProgEDITAt=true;
+									int currentpage=(Main.RealListNum-1)/8;
+									int startnum=currentpage*8+1;
+									int finalnum=currentpage*8+8;
+									//增加内容到此
+									Main.ProgEDITAt=true;
+									if(finalnum >Main.TotalListNum)
+										finalnum=Main.TotalListNum;
+									string[] InputNameArray = new string[8];
+							        int[] InputSizeArray = new int[8];
+							        string[] InputDateArray = new string[8];
+							        for(int i = 0; i < 8; i++)
+							        {
+								      InputNameArray[i] = "";
+								      InputSizeArray[i] = 0;
+								      InputDateArray[i] = "";
+							        }
+							        int MiddleNum = -1;
+							        for(int i = startnum; i < finalnum+1 ; i++)
+							        {
+								       MiddleNum++;
+								       InputNameArray[MiddleNum] = Main.FileNameList[i-1];	
+								       InputSizeArray[MiddleNum] = Main.FileSizeList[i-1];
+								       InputDateArray[MiddleNum] = Main.FileDateList[i-1];
+							        }
+							
+							Main.CodeName01 = InputNameArray[0];
+							Main.CodeName02 = InputNameArray[1];
+							Main.CodeName03 = InputNameArray[2];
+							Main.CodeName04 = InputNameArray[3];
+							Main.CodeName05 = InputNameArray[4];
+							Main.CodeName06 = InputNameArray[5];
+							Main.CodeName07 = InputNameArray[6];
+							Main.CodeName08 = InputNameArray[7];
+							
+							Main.CodeSize01 = InputSizeArray[0];
+							Main.CodeSize02 = InputSizeArray[1];
+							Main.CodeSize03 = InputSizeArray[2];
+							Main.CodeSize04 = InputSizeArray[3];
+							Main.CodeSize05 = InputSizeArray[4];
+							Main.CodeSize06 = InputSizeArray[5];
+							Main.CodeSize07 = InputSizeArray[6];
+							Main.CodeSize08 = InputSizeArray[7];
+							
+							Main.UpdateDate01 = InputDateArray[0];
+							Main.UpdateDate02 = InputDateArray[1];
+							Main.UpdateDate03 = InputDateArray[2];
+							Main.UpdateDate04 = InputDateArray[3];
+							Main.UpdateDate05 = InputDateArray[4];
+							Main.UpdateDate06 = InputDateArray[5];
+							Main.UpdateDate07 = InputDateArray[6];
+							Main.UpdateDate08 = InputDateArray[7];
+										
+										
+									}
+								Main.InputText="";
+						        Main.ProgEDITCusorPos = 57f;	
+								}
+							}
+						else
+					   {	
+								
+						Main.InputText="";
+						Main.ProgEDITCusorPos=57f;//增加内容到此
 							if(Main.FileNameList.Count == 0)
 								Debug.Log("No files in the memory now!");
 							else
@@ -529,7 +774,7 @@ public class SoftkeyModule : MonoBehaviour {
 								}
 								else	
 									Debug.Log("Program name is ilegal!");
-							}
+							}}
 						}
 						else
 						{
@@ -568,9 +813,15 @@ public class SoftkeyModule : MonoBehaviour {
 											if(normal_flag)
 											{
 												Main.FileNameList.Add(TempStrArray[0]);
-												Main.FileSizeList.Add((Int32)FileTestExtension.Length/1024);//内容--将文件大小的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
+												//内容--文件大小修改,0B转化为0K，1B-1024B转化为1K，1025B-2048B转化为2K。。。
+												//姓名--刘旋，时间--2013-3-21
+	     										int temp=0;
+												temp=(Int32)FileTestExtension.Length;
+												if(temp>0)
+														temp=(temp+1023)/1024;
+												Main.FileSizeList.Add(temp);
 												Main.ProgUsedNum++;
-												Main.ProgUsedSpace +=  (Int32)FileTestExtension.Length/1024;//内容--将文件大小的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
+												Main.ProgUsedSpace +=  temp;
 												Main.FileDateList.Add(FileTestExtension.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
 											}						
 										}	
@@ -978,6 +1229,8 @@ public class SoftkeyModule : MonoBehaviour {
 				         Main.ProgEDITFlip=6;
 		            else if (Main.ProgEDITFlip==6)
 				         Main.ProgEDITFlip=2;//变化内容到此
+					else if (Main.ProgEDITFlip==8)
+				         Main.ProgEDITFlip=0;
 				}
 				
 				if(Main.ProgEDITList)
