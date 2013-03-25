@@ -62,7 +62,6 @@ public class ModeSelectModule : MonoBehaviour {
 				{
 					Debug.Log(CompileNC_script.motionCode[i]);
 				}
-				
 			}
 			Main.ProgEDIT =false;
 			Main.ProgDNC = false;

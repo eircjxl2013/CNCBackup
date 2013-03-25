@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class ControlPanel : MonoBehaviour { 
 	
+	#region Defined script variable
 	PositionModule Position_Script;
 	SoftkeyModule Softkey_Script;
 	ProgramModule Program_Script;
@@ -21,7 +22,9 @@ public class ControlPanel : MonoBehaviour {
 	SpindleControl SpindleControl_script;
 	CooSystem CooSystem_script;
 	CompileNC CompileNC_script;
+	#endregion
 	
+	#region Defined variable
 	public float width = 670;
 	public float height = 650;
 	public bool RapidMoveFlag = false;
@@ -204,7 +207,9 @@ public class ControlPanel : MonoBehaviour {
 	public int ProgUsedNum = 0;
 	public int ProgUnusedNum = 400;
 	public int ProgUsedSpace = 0;
-	public int ProgUnusedSpace = 419430400;
+	//内容--内存总容量为512K，姓名--刘旋，时间--2013-3-18
+	public int ProgUnusedSpace = 512;//将419430400修改为512
+	
 	public float ProgEDITCusor = 0;
 	public float ProgEDITCusorV = 0;
 	public float ProgEDITCusorH = 0;
@@ -318,6 +323,15 @@ public class ControlPanel : MonoBehaviour {
 	public bool posOperationMode=false;//position下按下操作键,用来屏蔽第一、二、三个按钮的操作。
 	public int statusBeforeOperation=-1;
 	//位置界面功能完善---宋荣 ---03.09
+	
+	//内容--姓名--日期
+	//变量
+	//内容--定义布尔变量ProgEDITAt，用于选择程序时，前加@
+	//姓名--刘旋
+	//日期--2013-3-18
+	public bool ProgEDITAt=false;
+	
+	#endregion
 	
 	void Awake () 
 	{
@@ -668,6 +682,7 @@ public class ControlPanel : MonoBehaviour {
 		sty_MostWords.fontSize = 15;
 		//sty_MostWords.normal.textColor = Color.cyan;
 		
+		//sty_Code.font = (Font)Resources.Load("font/dutch");
 		sty_Code.fontSize = 17;
 		sty_Code.fontStyle = FontStyle.Bold;
 		
@@ -727,7 +742,7 @@ public class ControlPanel : MonoBehaviour {
 		EDITText.enabled = false;
 		EDITText.font = sty_Code.font;
 		EDITText.fontSize = sty_Code.fontSize;
-		EDITText.fontStyle=FontStyle.Bold;
+		//EDITText.fontStyle=FontStyle.Bold;
 		EDITText.text = "";
 		ProgEDITCusorPos = 57f;
 		CursorText.enabled = false;

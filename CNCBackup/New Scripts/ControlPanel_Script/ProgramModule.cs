@@ -169,7 +169,7 @@ public class ProgramModule : MonoBehaviour {
 		GUI.Label(new Rect(40f/1000f*Main.width,28f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"程序列表", Main.sty_Title);
 		GUI.Label(new Rect(45f/1000f*Main.width,58f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"", Main.sty_EDITList);
 		GUI.Label(new Rect(170f/1000f*Main.width,60f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"程序数", Main.sty_MostWords);
-		GUI.Label(new Rect(370f/1000f*Main.width,60f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"内存(BYTE)", Main.sty_MostWords);
+		GUI.Label(new Rect(370f/1000f*Main.width,60f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"内存(KBYTE)", Main.sty_MostWords);
 		GUI.Label(new Rect(60f/1000f*Main.width,79f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"已用：", Main.sty_MostWords);	
 		GUI.Label(new Rect(150f/1000f*Main.width,79f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.ProgUsedNum), Main.sty_ProgEDITListWindowNum);
 		GUI.Label(new Rect(370f/1000f*Main.width,79f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.ProgUsedSpace), Main.sty_ProgEDITListWindowNum);
@@ -179,47 +179,58 @@ public class ProgramModule : MonoBehaviour {
 		GUI.Label(new Rect(45f/1000f*Main.width,127f/1000f*Main.height,490f/1000f*Main.width,213f/1000f*Main.height),"", Main.sty_EDITList);
 		GUI.Label(new Rect(48f/1000f*Main.width,127f/1000f*Main.height,484f/1000f*Main.width,25f/1000f*Main.height),"", Main.sty_EDITLabel);
 		GUI.Label(new Rect(48f/1000f*Main.width,127f/1000f*Main.height,484f/1000f*Main.width,25f/1000f*Main.height),"设备：CNC_MEM", Main.sty_BottomChooseMenu);
-		GUI.Label(new Rect(60f/1000f*Main.width,153f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"O号码", Main.sty_MostWords);
-		GUI.Label(new Rect(200f/1000f*Main.width,153f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"容量(BYTE)", Main.sty_MostWords);
+		GUI.Label(new Rect(68f/1000f*Main.width,153f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"O号码", Main.sty_MostWords);
+		GUI.Label(new Rect(200f/1000f*Main.width,153f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"容量(KBYTE)", Main.sty_MostWords);
 		GUI.Label(new Rect(400f/1000f*Main.width,153f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height),"更新时间", Main.sty_MostWords);
-		if(Main.CodeName01 != "")
-			GUI.Label(new Rect(48f/1000f*Main.width, Main.ProgEDITCusor/1000f*Main.height,484f/1000f*Main.width,21f/1000f*Main.height),"", Main.sty_EDITCursor);			
-		GUI.Label(new Rect(58f/1000f*Main.width,174f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName01, Main.sty_ClockStyle);
+		
+		//去掉黄色选择图标，姓名--刘旋，时间--2013-3-21
+		//if(Main.CodeName01 != "")
+			//GUI.Label(new Rect(48f/1000f*Main.width, Main.ProgEDITCusor/1000f*Main.height,484f/1000f*Main.width,21f/1000f*Main.height),"", Main.sty_EDITCursor);
+		
+		//内容--如果对程序进行选择，在被选程序前加@
+		//姓名--刘旋
+		//时间--2013-3-18
+		if(Main.ProgEDITAt)
+			GUI.Label(new Rect(48f/1000f*Main.width, (Main.ProgEDITCusor-5f)/1000f*Main.height,484f/1000f*Main.width,30f/1000f*Main.height),"@", Main.sty_ClockStyle);
+			
+		//增加内容到此
+		
+		GUI.Label(new Rect(68f/1000f*Main.width,174f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName01, Main.sty_ClockStyle);
 		if(Main.CodeName01 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,174f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize01), Main.sty_ClockStyle);			
 		GUI.Label(new Rect(330f/1000f*Main.width,174f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate01, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,194f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName02, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,194f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName02, Main.sty_ClockStyle);
 		if(Main.CodeName02 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,194f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize02), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,194f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate02, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,214f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName03, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,214f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName03, Main.sty_ClockStyle);
 		if(Main.CodeName03 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,214f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize03), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,214f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate03, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,234f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName04, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,234f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName04, Main.sty_ClockStyle);
 		if(Main.CodeName04 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,234f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize04), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,234f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate04, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,254f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName05, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,254f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName05, Main.sty_ClockStyle);
 		if(Main.CodeName05 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,254f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize05), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,254f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate05, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,274f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName06, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,274f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName06, Main.sty_ClockStyle);
 		if(Main.CodeName06 != "")	
 			GUI.Label(new Rect(200f/1000f*Main.width,274f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize06), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,274f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate06, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,294f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName07, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,294f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName07, Main.sty_ClockStyle);
 		if(Main.CodeName07 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,294f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize07), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,294f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate07, Main.sty_ClockStyle);
 		
-		GUI.Label(new Rect(58f/1000f*Main.width,314f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName08, Main.sty_ClockStyle);
+		GUI.Label(new Rect(68f/1000f*Main.width,314f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.CodeName08, Main.sty_ClockStyle);
 		if(Main.CodeName08 != "")
 			GUI.Label(new Rect(200f/1000f*Main.width,314f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.NumberFormat(Main.CodeSize08), Main.sty_ClockStyle);
 		GUI.Label(new Rect(330f/1000f*Main.width,314f/1000f*Main.height,490f/1000f*Main.width,65f/1000f*Main.height), Main.UpdateDate08, Main.sty_ClockStyle);
@@ -232,7 +243,11 @@ public class ProgramModule : MonoBehaviour {
 			Main.sty_BottomButton_4.normal.background = Main.t2d_BottomButton_u;
 			Main.sty_BottomButton_5.normal.background = Main.t2d_BottomButton_u;
 			GUI.Label(new Rect(78f/1000f*Main.width,420f/1000f*Main.height,70f/1000f*Main.width,25f/1000f*Main.height),"程 序", Main.sty_BottomChooseMenu);
-			GUI.Label(new Rect(171f/1000f*Main.width,421f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"列 表", Main.sty_BottomChooseMenu);
+			//内容--当程序超过一页时，显示“列表+”否则显示列表，姓名--刘旋，时间--2013-3-18
+			if (Main.TotalListNum>8)
+				GUI.Label(new Rect(171f/1000f*Main.width,421f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"列 表+", Main.sty_BottomChooseMenu);
+			else //增加内容到此
+			    GUI.Label(new Rect(171f/1000f*Main.width,421f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"列 表", Main.sty_BottomChooseMenu);
 			GUI.Label(new Rect(423f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"（操 作）", Main.sty_BottomChooseMenu);
 		}
 		else if(Main.ProgEDITFlip == 1)

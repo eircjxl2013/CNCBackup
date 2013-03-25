@@ -365,7 +365,7 @@ public class SoftkeyModule : MonoBehaviour {
 						Main.FileSizeList.Clear();
 						Main.FileDateList.Clear();
 						Main.ProgUnusedNum = 400;
-						Main.ProgUnusedSpace = 419430400;
+						Main.ProgUnusedSpace = 512;//内容--内存总容量为512K，姓名--刘旋，时间--2013-3-180;
 						Main.ProgUsedNum = 0;
 						Main.ProgUsedSpace = 0;
 						FileInfo FileTestExtension;	
@@ -399,9 +399,9 @@ public class SoftkeyModule : MonoBehaviour {
 								if(normal_flag)
 								{
 									Main.FileNameList.Add(TempStrArray[0]);
-									Main.FileSizeList.Add((Int32)FileTestExtension.Length);
+									Main.FileSizeList.Add((Int32)FileTestExtension.Length/1024);//内容--将文件大小的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
 									Main.ProgUsedNum++;
-									Main.ProgUsedSpace +=  (Int32)FileTestExtension.Length;
+									Main.ProgUsedSpace +=  (Int32)FileTestExtension.Length/1024;//内容--将已用内存的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
 									Main.FileDateList.Add(FileTestExtension.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
 								}
 							}	
@@ -568,9 +568,9 @@ public class SoftkeyModule : MonoBehaviour {
 											if(normal_flag)
 											{
 												Main.FileNameList.Add(TempStrArray[0]);
-												Main.FileSizeList.Add((Int32)FileTestExtension.Length);
+												Main.FileSizeList.Add((Int32)FileTestExtension.Length/1024);//内容--将文件大小的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
 												Main.ProgUsedNum++;
-												Main.ProgUsedSpace +=  (Int32)FileTestExtension.Length;
+												Main.ProgUsedSpace +=  (Int32)FileTestExtension.Length/1024;//内容--将文件大小的单位转换为KB，1KB=1024B，姓名--刘旋，时间--2013-3-18
 												Main.FileDateList.Add(FileTestExtension.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
 											}						
 										}	
