@@ -285,6 +285,10 @@ public class MDIInputModule : MonoBehaviour {
 			}
 			if(Main.ProgEDITCusorPos < 335f)
 			{
+				if(Main.ProgEDITList)
+				{
+					Main.ProgEDITFlip = 1;
+				}
 				if(Main.ShiftFlag)
 				{
 					Main.InputText += with_shift;

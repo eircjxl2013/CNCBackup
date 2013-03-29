@@ -174,6 +174,8 @@ public class ControlPanel : MonoBehaviour {
 	public GUIStyle sty_OffSet_Coo;
 	public GUIStyle sty_SettingsBG;
 	
+	public GUIStyle sty_EditListTop;
+	
 	public bool PosMenu = true;
 	public bool RelativeCoo = false;
 	public bool AbsoluteCoo = true;
@@ -251,7 +253,9 @@ public class ControlPanel : MonoBehaviour {
 	public int RealCodeNum = 1;
 	public int HorizontalNum = 1;
 	public int VerticalNum = 1;
+	//The total amount of satisfatory NC files in the Gcode directory.
 	public int TotalListNum = 0;
+	//The location of current file in the NC file list.
 	public int RealListNum = 1;
 	public string Code01 = "";
 	public string Code02 = "";
@@ -262,31 +266,11 @@ public class ControlPanel : MonoBehaviour {
 	public string Code07 = "";
 	public string Code08 = "";
 	public string Code09 = "";
-	public string CodeName01 = "";
-	public int CodeSize01 = 0;
-	public string UpdateDate01 = "";
-	public string CodeName02 = "";
-	public int CodeSize02 = 0;
-	public string UpdateDate02 = "";
-	public string CodeName03 = "";
-	public int CodeSize03 = 0;
-	public string UpdateDate03 = "";
-	public string CodeName04 = "";
-	public int CodeSize04 = 0;
-	public string UpdateDate04 = "";
-	public string CodeName05 = "";
-	public int CodeSize05 = 0;
-	public string UpdateDate05 = "";
-	public string CodeName06 = "";
-	public int CodeSize06 = 0;
-	public string UpdateDate06 = "";
-	public string CodeName07 = "";
-	public int CodeSize07 = 0;
-	public string UpdateDate07 = "";
-	public string CodeName08 = "";
-	public int CodeSize08 = 0;
-	public string UpdateDate08 = "";
+	public string[] CodeName = new string[8];
+	public int[] CodeSize = new int[8];
+	public string[] UpdateDate = new string[8];
 	public string current_filename = "";
+	//The location of current file in the NC file list. Co-operate with arqument RealFileList.
 	public int current_filenum = 0;
 	
 	public GUIText EDITText;
@@ -330,7 +314,8 @@ public class ControlPanel : MonoBehaviour {
 	//姓名--刘旋
 	//日期--2013-3-18
 	public bool ProgEDITAt=false;
-	
+	public int at_position = -1;
+	public int at_page_number = -1;
 	#endregion
 	
 	void Awake () 
@@ -656,6 +641,7 @@ public class ControlPanel : MonoBehaviour {
 		sty_Alarm.normal.textColor = Color.white;
 		
 		sty_BottomChooseMenu.font = (Font)Resources.Load("font/monoMMM_5");
+		//sty_BottomChooseMenu.font = (Font)Resources.Load("font/times");
 		sty_BottomChooseMenu.fontSize = 14;
 		
 		sty_ProgEditProgNum.font = (Font)Resources.Load("font/monoMMM_5");
@@ -760,6 +746,8 @@ public class ControlPanel : MonoBehaviour {
 		sty_OffSet_Coo_mini.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/offset_coo_mini");
 		sty_OffSet_Coo_mid.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/offset_coo_mid");
 		//设定界面修改---陈振华---03.11
+		
+		sty_EditListTop.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/EditListTop");
 	}
 	
 	void OnGUI()

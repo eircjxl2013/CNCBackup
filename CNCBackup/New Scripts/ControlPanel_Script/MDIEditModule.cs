@@ -7,12 +7,13 @@ using System.IO;//内容--增加文件IO功能，姓名--刘旋，时间--2013-3
 public class MDIEditModule : MonoBehaviour {
 	ControlPanel Main;
 	CooSystem CooSystem_script;
-	
-	
+	SoftkeyModule Softkey_Script;
+
 	// Use this for initialization
 	void Start () {
 		Main = gameObject.GetComponent<ControlPanel>();
 		CooSystem_script = gameObject.GetComponent<CooSystem>();
+		Softkey_Script = gameObject.GetComponent<SoftkeyModule>();
 	}
 	
 	public void Edit ()
@@ -217,7 +218,9 @@ public class MDIEditModule : MonoBehaviour {
 		return Value;
 	}
 	
-	
+	/// <summary>
+	/// 替换功能，不好意思，恶心的代码待修改
+	/// </summary>
 	void AlterCode()
 	{
 		if(Main.MoreThanOneArray[Main.VerticalNum - 1])
@@ -605,7 +608,9 @@ public class MDIEditModule : MonoBehaviour {
 		}
 	}
 	
-	
+	/// <summary>
+	/// 中间过程函数
+	/// </summary>
 	void MiddleCodeEdit (int StartRealNum, int StartVerticalNum) 
 	{
 		List<string> CalStr = new List<string>();
@@ -715,7 +720,9 @@ public class MDIEditModule : MonoBehaviour {
 		}	
 	}
 	
-	
+	/// <summary>
+	/// 中间过程函数
+	/// </summary>
 	void MiddleCodeSpecialEdit(int StartRealNum, int StartVerticalNum)  
 	{
 		List<string> CalStr = new List<string>();
@@ -829,7 +836,9 @@ public class MDIEditModule : MonoBehaviour {
 		}
 	}
 	
-	
+	/// <summary>
+	/// 插入功能，不好意思，恶心的代码待修改
+	/// </summary>
 	void InsertCode ()
 	{
 		if(Main.MoreThanOneArray[Main.VerticalNum - 1])
@@ -1202,7 +1211,9 @@ public class MDIEditModule : MonoBehaviour {
 		}	
 	}
 	
-	
+	/// <summary>
+	/// 初步格式化，不好意思，恶心的代码待修改
+	/// </summary>
 	public void CodeEdit ()
 	{
 		List<int> RealNumList = new List<int>();
@@ -1352,8 +1363,7 @@ public class MDIEditModule : MonoBehaviour {
 		Main.Code08 = Main.TempCodeArray[7];
 		Main.Code09 = Main.TempCodeArray[8];
 	}
-	
-	
+
 	void DeleteCode () 
 	{
 		List<string> TempCodeSubList = new List<string>();
@@ -1663,13 +1673,16 @@ public class MDIEditModule : MonoBehaviour {
 		}	
 	}
 	
-	
+	/// <summary>
+	/// 向上翻页，程序翻页部分待修改
+	/// </summary>
 	void PageUp () 
 	{	
 		if(Main.ProgMenu)
 		{
 			if(Main.ProgEDIT)
 			{
+				//程序翻页
 				if(Main.ProgEDITProg)
 				{
 					if(Main.RealNumArray[0] == 0)
@@ -1692,68 +1705,52 @@ public class MDIEditModule : MonoBehaviour {
 						Main.TextSize = Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
 					}
 				}
+				//列表翻页
 				if(Main.ProgEDITList)
 				{
-					//内容--按下翻页按钮对程序进行选择时，在被选程序前加@
-					//姓名--刘旋
-					//时间--2013-3-18
-					Main.ProgEDITAt=true;
-					//增加内容到此
-					
-					if(Main.ProgEDITFlip == 0)
-						Main.ProgEDITFlip = 1;
-					int CurrentPage = (Main.RealListNum -1) / 8;
-					if(CurrentPage > 0)	
-						CurrentPage--;
-					Main.ProgEDITCusor = 175f;	
-					Main.RealListNum = CurrentPage * 8 + 1; 
-					string[] TempNameArray = new string[8];	
-					int[] TempSizeArray = new int[8];		
-					string[] TempDateArray = new string[8];			
-					for(int i = 0; i < 8; i++)
+					if(Main.CodeName[0] != "")
 					{
-						TempNameArray[i] = "";	
-						TempSizeArray[i] = 0;
-						TempDateArray[i] = "";
+						if(Main.ProgEDITFlip == 0)
+							Main.ProgEDITFlip = 1;
+						int name_index = Main.FileNameList.IndexOf(Main.CodeName[0]);
+						if(name_index >= 0)
+						{//1 level
+							int current_page = name_index / 8;
+							//下面还有页数则翻页，无则不翻页
+							if(current_page > 0)
+							{
+								current_page--;
+								name_index = current_page * 8 +1;
+								string[] TempNameArray = new string[8];
+								int[] TempSizeArray = new int[8]; 
+								string[] TempDateArray = new string[8];
+								for(int i = 0; i < 8; i++)
+								{
+									TempNameArray[i] = "";
+									TempSizeArray[i] = 0;
+									TempDateArray[i] = "";
+								}
+								int final_index = name_index + 7;
+								if(final_index > Main.TotalListNum)
+									final_index = Main.TotalListNum;
+								int temp_index = -1;
+								for(int i = name_index - 1; i < final_index; i++)
+								{
+									temp_index++;
+									TempNameArray[temp_index] = Main.FileNameList[i];
+									TempSizeArray[temp_index] = Main.FileSizeList[i];
+									TempDateArray[temp_index] = Main.FileDateList[i];
+								}
+								for(int i = 0; i < 8; i++)
+								{
+									Main.CodeName[i] = TempNameArray[i];
+									Main.CodeSize[i] = TempSizeArray[i];
+									Main.UpdateDate[i] = TempDateArray[i];
+								}
+								Softkey_Script.Locate_At_Position(Main.RealListNum);
+							}
+						}//1 level
 					}
-					int MiddleNum = -1;
-					int FinalNum = Main.RealListNum + 7;
-					if(FinalNum > Main.TotalListNum)	
-						FinalNum = Main.TotalListNum;
-					for(int i = Main.RealListNum - 1; i < FinalNum; i++)
-					{
-						MiddleNum++;
-						TempNameArray[MiddleNum] = Main.FileNameList[i];
-						TempSizeArray[MiddleNum] = Main.FileSizeList[i];
-						TempDateArray[MiddleNum] = Main.FileDateList[i];
-					}
-					
-					Main.CodeName01 = TempNameArray[0];
-					Main.CodeName02 = TempNameArray[1];
-					Main.CodeName03 = TempNameArray[2];
-					Main.CodeName04 = TempNameArray[3];
-					Main.CodeName05 = TempNameArray[4];
-					Main.CodeName06 = TempNameArray[5];
-					Main.CodeName07 = TempNameArray[6];
-					Main.CodeName08 = TempNameArray[7];
-					
-					Main.CodeSize01 = TempSizeArray[0];
-					Main.CodeSize02 = TempSizeArray[1];
-					Main.CodeSize03 = TempSizeArray[2];
-					Main.CodeSize04 = TempSizeArray[3];
-					Main.CodeSize05 = TempSizeArray[4];
-					Main.CodeSize06 = TempSizeArray[5];
-					Main.CodeSize07 = TempSizeArray[6];
-					Main.CodeSize08 = TempSizeArray[7];
-					
-					Main.UpdateDate01 = TempDateArray[0];
-					Main.UpdateDate02 = TempDateArray[1];
-					Main.UpdateDate03 = TempDateArray[2];
-					Main.UpdateDate04 = TempDateArray[3];
-					Main.UpdateDate05 = TempDateArray[4];
-					Main.UpdateDate06 = TempDateArray[5];
-					Main.UpdateDate07 = TempDateArray[6];
-					Main.UpdateDate08 = TempDateArray[7];	
 				}
 			}
 		}
@@ -1775,12 +1772,16 @@ public class MDIEditModule : MonoBehaviour {
 		}
 	}
 	
+	/// <summary>
+	/// 向上翻页，程序翻页部分待修改
+	/// </summary>
 	void PageDown () {
 		
 		if(Main.ProgMenu)
 		{
 			if(Main.ProgEDIT)
 			{
+				//程序界面向下翻页
 				if(Main.ProgEDITProg)
 				{
 					if(Main.RealNumArray[8] == -1 || Main.RealNumArray[8] == Main.TotalCodeNum - 1)
@@ -1799,69 +1800,53 @@ public class MDIEditModule : MonoBehaviour {
 						Main.TextSize = Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
 					}
 				}
+				//列表界面向下翻页
 				if(Main.ProgEDITList)
 				{
-					//内容--按下翻页按钮对程序进行选择时，在被选程序前加@
-					//姓名--刘旋
-					//时间--2013-3-18
-					Main.ProgEDITAt=true;
-					//增加内容到此
-					
-					if(Main.ProgEDITFlip == 0)
-						Main.ProgEDITFlip = 1;
-					int TotalPage = (Main.TotalListNum - 1) / 8;
-					int CurrentPage = (Main.RealListNum - 1) / 8;
-					if(TotalPage > CurrentPage)
-						CurrentPage++;
-					Main.ProgEDITCusor = 175f;
-					Main.RealListNum = CurrentPage * 8 + 1; 
-					string[] TempNameArray = new string[8];
-					int[] TempSizeArray = new int[8]; 
-					string[] TempDateArray = new string[8];
-					for(int i = 0; i < 8; i++)
+					if(Main.CodeName[0] != "")
 					{
-						TempNameArray[i] = "";
-						TempSizeArray[i] = 0;
-						TempDateArray[i] = "";
+						if(Main.ProgEDITFlip == 0)
+							Main.ProgEDITFlip = 1;
+						int name_index = Main.FileNameList.IndexOf(Main.CodeName[0]);
+						if(name_index >= 0)
+						{//2 level
+							int total_page = (Main.TotalListNum - 1) / 8;
+							int current_page = name_index / 8;
+							//下面还有页数则翻页，无则不翻页
+							if(total_page > current_page)
+							{
+								current_page++;
+								name_index = current_page * 8 +1;
+								string[] TempNameArray = new string[8];
+								int[] TempSizeArray = new int[8]; 
+								string[] TempDateArray = new string[8];
+								for(int i = 0; i < 8; i++)
+								{
+									TempNameArray[i] = "";
+									TempSizeArray[i] = 0;
+									TempDateArray[i] = "";
+								}
+								int final_index = name_index + 7;
+								if(final_index > Main.TotalListNum)
+									final_index = Main.TotalListNum;
+								int temp_index = -1;
+								for(int i = name_index - 1; i < final_index; i++)
+								{
+									temp_index++;
+									TempNameArray[temp_index] = Main.FileNameList[i];
+									TempSizeArray[temp_index] = Main.FileSizeList[i];
+									TempDateArray[temp_index] = Main.FileDateList[i];
+								}
+								for(int i = 0; i < 8; i++)
+								{
+									Main.CodeName[i] = TempNameArray[i];
+									Main.CodeSize[i] = TempSizeArray[i];
+									Main.UpdateDate[i] = TempDateArray[i];
+								}
+								Softkey_Script.Locate_At_Position(Main.RealListNum);
+							}
+						}//2 level
 					}
-					int MiddleNum = -1;
-					int FinalNum = Main.RealListNum + 7;
-					if(FinalNum > Main.TotalListNum)
-						FinalNum = Main.TotalListNum;
-					for(int i = Main.RealListNum - 1; i < FinalNum; i++)
-					{
-						MiddleNum++;
-						TempNameArray[MiddleNum] = Main.FileNameList[i];
-						TempSizeArray[MiddleNum] = Main.FileSizeList[i];
-						TempDateArray[MiddleNum] = Main.FileDateList[i];
-					}
-					
-					Main.CodeName01 = TempNameArray[0];
-					Main.CodeName02 = TempNameArray[1];
-					Main.CodeName03 = TempNameArray[2];
-					Main.CodeName04 = TempNameArray[3];
-					Main.CodeName05 = TempNameArray[4];
-					Main.CodeName06 = TempNameArray[5];
-					Main.CodeName07 = TempNameArray[6];
-					Main.CodeName08 = TempNameArray[7];
-						
-					Main.CodeSize01 = TempSizeArray[0];
-					Main.CodeSize02 = TempSizeArray[1];
-					Main.CodeSize03 = TempSizeArray[2];
-					Main.CodeSize04 = TempSizeArray[3];
-					Main.CodeSize05 = TempSizeArray[4];
-					Main.CodeSize06 = TempSizeArray[5];
-					Main.CodeSize07 = TempSizeArray[6];
-					Main.CodeSize08 = TempSizeArray[7];
-					
-					Main.UpdateDate01 = TempDateArray[0];
-					Main.UpdateDate02 = TempDateArray[1];
-					Main.UpdateDate03 = TempDateArray[2];
-					Main.UpdateDate04 = TempDateArray[3];
-					Main.UpdateDate05 = TempDateArray[4];
-					Main.UpdateDate06 = TempDateArray[5];
-					Main.UpdateDate07 = TempDateArray[6];
-					Main.UpdateDate08 = TempDateArray[7];
 				}
 			}
 		}
@@ -1883,6 +1868,9 @@ public class MDIEditModule : MonoBehaviour {
 		}
 	}
 	
+	/// <summary>
+	/// 光标左移，不好意思，恶心的代码待修改
+	/// </summary>
 	void EditProgLeft()
 	{
 		string[] CurrentRowStr = Main.TempCodeArray[Main.VerticalNum - 1].TrimEnd().Split(' ');
@@ -2249,8 +2237,9 @@ public class MDIEditModule : MonoBehaviour {
 		}
 	}
 	
-	
-	
+	/// <summary>
+	/// 光标上移按钮
+	/// </summary>
 	void UpButton () {
 		
 		if(Main.ProgMenu)
@@ -2263,104 +2252,6 @@ public class MDIEditModule : MonoBehaviour {
 					bool NumInNine = false;
 					EditProgUp(NumInNine);
 				}
-				
-				//O检索时
-				//if(Main.ProgEDITList)
-				//{
-					
-					//内容--按下向上按钮对程序进行选择时，在被选程序前加@
-					//姓名--刘旋
-					//时间--2013-3-18
-					//Main.ProgEDITAt=true;
-					//增加内容到此
-					
-					
-					//if(Main.ProgEDITFlip == 0 && Main.RealListNum != 1)
-						//Main.ProgEDITFlip = 1;
-					//switch((int)Main.ProgEDITCusor)
-					//{
-					//case 175:
-						//if(Main.RealListNum > 1)
-						//{
-							//Main.RealListNum--;
-							//string[] TempNameArray = new string[8];
-							//int[] TempSizeArray = new int[8];
-							//string[] TempDateArray = new string[8];
-							//for(int i = 0; i < 8; i++)
-							//{
-							//	TempNameArray[i] = "";
-							//	TempSizeArray[i] = 0;
-							//	TempDateArray[i] = "";
-							//}
-							//int MiddleNum = -1;
-							//int FinalNum = Main.RealListNum + 7;
-							//if(FinalNum > Main.TotalListNum)
-								//FinalNum = Main.TotalListNum;
-							//for(int i = Main.RealListNum - 1; i < FinalNum; i++)
-							//{
-								//MiddleNum++;
-								//TempNameArray[MiddleNum] = Main.FileNameList[i];
-								//TempSizeArray[MiddleNum] = Main.FileSizeList[i];
-								//TempDateArray[MiddleNum] = Main.FileDateList[i];
-							//}
-							
-							//Main.CodeName01 = TempNameArray[0];
-							//Main.CodeName02 = TempNameArray[1];
-							//Main.CodeName03 = TempNameArray[2];
-							//Main.CodeName04 = TempNameArray[3];
-							//Main.CodeName05 = TempNameArray[4];
-							//Main.CodeName06 = TempNameArray[5];
-							//Main.CodeName07 = TempNameArray[6];
-							//Main.CodeName08 = TempNameArray[7];
-							
-							//Main.CodeSize01 = TempSizeArray[0];
-							//Main.CodeSize02 = TempSizeArray[1];
-							//Main.CodeSize03 = TempSizeArray[2];
-							//Main.CodeSize04 = TempSizeArray[3];
-							//Main.CodeSize05 = TempSizeArray[4];
-							//Main.CodeSize06 = TempSizeArray[5];
-							//Main.CodeSize07 = TempSizeArray[6];
-							//Main.CodeSize08 = TempSizeArray[7];
-							
-							//Main.UpdateDate01 = TempDateArray[0];
-							//Main.UpdateDate02 = TempDateArray[1];
-							//Main.UpdateDate03 = TempDateArray[2];
-							//Main.UpdateDate04 = TempDateArray[3];
-							//Main.UpdateDate05 = TempDateArray[4];
-							//Main.UpdateDate06 = TempDateArray[5];
-							//Main.UpdateDate07 = TempDateArray[6];
-							//Main.UpdateDate08 = TempDateArray[7];
-						//}
-						//break;
-					//case 195:
-						//Main.RealListNum--;
-						//Main.ProgEDITCusor = 175f;
-						//break;
-					//case 215:
-						//Main.ProgEDITCusor = 195f;
-						//break;
-					//case 235:
-						//Main.RealListNum--;
-						//Main.ProgEDITCusor = 215f;
-						//break;
-					//case 255:
-						//Main.RealListNum--;
-						//Main.ProgEDITCusor = 235f;
-						//break;	
-					//case 275:
-						//Main.RealListNum--;
-						//Main.ProgEDITCusor = 255f;
-						//break;
-					//case 295:
-						//Main.RealListNum--;
-						//Main.ProgEDITCusor = 275f;
-						//break;
-					//case 315:
-						//Main.RealListNum--;
-						//Main.ProgEDITCusor = 295f;
-						//break;
-					//}
-				//}
 			}
 		}
 		
@@ -2382,6 +2273,9 @@ public class MDIEditModule : MonoBehaviour {
 		}
 	}
 	
+	/// <summary>
+	/// 光标下移按钮
+	/// </summary>
 	void DownButton () {
 		
 		if(Main.ProgMenu)
@@ -2389,316 +2283,34 @@ public class MDIEditModule : MonoBehaviour {
 			if(Main.ProgEDIT)
 			{
 				//编辑程序时
+				//分两种情况：如果输入以“O”开始，则执行“O检索”功能；否则执行光标下移功能.
 				if(Main.ProgEDITProg)
 				{
-					bool NumInNine = false;
-					EditProgDown(NumInNine);
-				}
-				
-				//O检索时
-				if(Main.ProgEDITList)
-				{
-					//if(Main.InputText=="")//MDI键盘输入为空,姓名--刘旋,时间--2013-3-18
-					//{
-					
-					//内容--按下向下按钮对程序进行选择时，在被选程序前加@
-					//姓名--刘旋
-					//时间--2013-3-18
-					//Main.ProgEDITAt=true;
-					//增加内容到此
-					
-					//if(Main.ProgEDITFlip == 0)
-						//Main.ProgEDITFlip = 1;	
-					//switch((int)Main.ProgEDITCusor)
-					//{
-					//case 175:
-						//if(Main.CodeName01 != "")
-						//{
-							//if(Main.TotalListNum > Main.RealListNum)
-							//{
-								//Main.RealListNum++;
-								//Main.ProgEDITCusor = 195f;
-							//}
-						//}
-						//break;		
-					//case 195:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//Main.ProgEDITCusor = 215f;
-						//}
-						//break;
-					//case 215:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//Main.ProgEDITCusor = 235f;
-						//}
-						//break;
-					//case 235:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//Main.ProgEDITCusor = 255f;
-						//}
-						//break;
-					//case 255:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//Main.ProgEDITCusor = 275f;
-						//}
-						//break;
-					//case 275:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//Main.ProgEDITCusor = 295f;
-						//}
-						//break;
-					//case 295:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//Main.ProgEDITCusor = 315f;
-						//}
-						//break;
-					//case 315:
-						//if(Main.TotalListNum > Main.RealListNum)
-						//{
-							//Main.RealListNum++;
-							//string[] TempNameArray = new string[8];
-							//int[] TempSizeArray = new int[8];
-							//string[] TempDateArray = new string[8];
-							//for(int i = 0; i < 8; i++)
-							//{
-								//TempNameArray[i] = "";
-								//TempSizeArray[i] = 0;
-								//TempDateArray[i] = "";
-							//}
-							//int MiddleNum = -1;
-							//for(int i = Main.RealListNum - 8; i < Main.RealListNum; i++)
-							//{
-								//MiddleNum++;
-								//TempNameArray[MiddleNum] = Main.FileNameList[i];	
-								//TempSizeArray[MiddleNum] = Main.FileSizeList[i];
-								//TempDateArray[MiddleNum] = Main.FileDateList[i];
-							//}
-							
-							//Main.CodeName01 = TempNameArray[0];
-							//Main.CodeName02 = TempNameArray[1];
-							//Main.CodeName03 = TempNameArray[2];
-							//Main.CodeName04 = TempNameArray[3];
-							//Main.CodeName05 = TempNameArray[4];
-							//Main.CodeName06 = TempNameArray[5];
-							//Main.CodeName07 = TempNameArray[6];
-							//Main.CodeName08 = TempNameArray[7];
-							
-							//Main.CodeSize01 = TempSizeArray[0];
-							//Main.CodeSize02 = TempSizeArray[1];
-							//Main.CodeSize03 = TempSizeArray[2];
-							//Main.CodeSize04 = TempSizeArray[3];
-							//Main.CodeSize05 = TempSizeArray[4];
-							//Main.CodeSize06 = TempSizeArray[5];
-							//Main.CodeSize07 = TempSizeArray[6];
-							//Main.CodeSize08 = TempSizeArray[7];
-							
-							//Main.UpdateDate01 = TempDateArray[0];
-							//Main.UpdateDate02 = TempDateArray[1];
-							//Main.UpdateDate03 = TempDateArray[2];
-							//Main.UpdateDate04 = TempDateArray[3];
-							//Main.UpdateDate05 = TempDateArray[4];
-							//Main.UpdateDate06 = TempDateArray[5];
-							//Main.UpdateDate07 = TempDateArray[6];
-							//Main.UpdateDate08 = TempDateArray[7];
-						//}
-						//break;
-					//}
-				//}
-					//else //MDI键盘输入不为空,MDI键盘输入程序名称，再按向下按钮实现程序选择,姓名--刘旋,时间--2013-3-18
-					//{
-						if(Main.InputText[0]=='O')
-						{
-							if(Main.InputText.Length<=5)
-							{
-								if(Main.InputText.Length>1)//内容--当MDI键盘输入“O”时，再按下“向下”按钮，直接打开下一个程序,姓名--刘旋,时间--2013-3-20
-								{
-								char[] temp_name=Main.InputText.ToCharArray ();
-								bool normal_flag=true;
-								for(int j=0;j<temp_name.Length ;j++)
-								{
-									if(temp_name[j] == 'O' || (temp_name[j] >= '0' && temp_name[j] <= '9'))
-									    continue;
-								    else
-								       {
-									      normal_flag = false;
-									      break;
-								       }
-								}
-									if(normal_flag)
-									{
-										int inputname = Convert.ToInt32(Main.InputText.Trim('O'));
-										String tempinput_name=Main.ToolNumFormat(inputname);
-										String input_name='O'+tempinput_name;
-										int m=0;
-										while(input_name!=Main.FileNameList[m])
-									     {
-										    m++;
-									     }
-									Main.RealListNum=m+1;
-									Main.ProgramNum = Convert.ToInt32(Main.FileNameList[Main.RealListNum - 1].Trim('O'));
-									if (Main.ProgEDITFlip==0)
-										Main.ProgEDITFlip=1;
-									//内容--对于某一程序号，只在特定的位置显示
-					               //姓名--刘旋，时间--2-13-3-21
-									int middle_num=0;
-									middle_num=Main.RealListNum%8;
-									switch(middle_num)
-									{
-									case 1:
-										Main.ProgEDITCusor=175f;
-										break;
-									case 2:
-										Main.ProgEDITCusor=195f;
-										break;
-									case 3:
-										Main.ProgEDITCusor=215f;
-										break;
-									case 4:
-										Main.ProgEDITCusor=235f;
-										break;
-									case 5:
-										Main.ProgEDITCusor=255f;
-										break;
-									case 6:
-										Main.ProgEDITCusor=275f;
-										break;
-									case 7:
-										Main.ProgEDITCusor=295f;
-										break;
-									case 0:
-										Main.ProgEDITCusor=315f;
-										break;
-											
-									}
-									Main.ProgEDITAt=true;
-									int currentpage=(Main.RealListNum-1)/8;
-									int startnum=currentpage*8+1;
-									int finalnum=currentpage*8+8;
-									//增加内容到此
-									if(finalnum >Main.TotalListNum)
-										finalnum=Main.TotalListNum;
-									string[] InputNameArray = new string[8];
-							        int[] InputSizeArray = new int[8];
-							        string[] InputDateArray = new string[8];
-							        for(int i = 0; i < 8; i++)
-							        {
-								      InputNameArray[i] = "";
-								      InputSizeArray[i] = 0;
-								      InputDateArray[i] = "";
-							        }
-							        int MiddleNum = -1;
-							        for(int i = startnum; i < finalnum+1 ; i++)
-							        {
-								       MiddleNum++;
-								       InputNameArray[MiddleNum] = Main.FileNameList[i-1];	
-								       InputSizeArray[MiddleNum] = Main.FileSizeList[i-1];
-								       InputDateArray[MiddleNum] = Main.FileDateList[i-1];
-							        }
-							
-							Main.CodeName01 = InputNameArray[0];
-							Main.CodeName02 = InputNameArray[1];
-							Main.CodeName03 = InputNameArray[2];
-							Main.CodeName04 = InputNameArray[3];
-							Main.CodeName05 = InputNameArray[4];
-							Main.CodeName06 = InputNameArray[5];
-							Main.CodeName07 = InputNameArray[6];
-							Main.CodeName08 = InputNameArray[7];
-							
-							Main.CodeSize01 = InputSizeArray[0];
-							Main.CodeSize02 = InputSizeArray[1];
-							Main.CodeSize03 = InputSizeArray[2];
-							Main.CodeSize04 = InputSizeArray[3];
-							Main.CodeSize05 = InputSizeArray[4];
-							Main.CodeSize06 = InputSizeArray[5];
-							Main.CodeSize07 = InputSizeArray[6];
-							Main.CodeSize08 = InputSizeArray[7];
-							
-							Main.UpdateDate01 = InputDateArray[0];
-							Main.UpdateDate02 = InputDateArray[1];
-							Main.UpdateDate03 = InputDateArray[2];
-							Main.UpdateDate04 = InputDateArray[3];
-							Main.UpdateDate05 = InputDateArray[4];
-							Main.UpdateDate06 = InputDateArray[5];
-							Main.UpdateDate07 = InputDateArray[6];
-							Main.UpdateDate08 = InputDateArray[7];
-										
-										
-									}
-								Main.InputText="";
-						        Main.ProgEDITCusorPos = 57f;
-								
-							}	
-								
-							else
-						    {//内容--MDI键盘输入“O”，再按下“向下”按钮，直接打开下一个程序,姓名--刘旋,时间--2013-3-20
-							        if (Main.RealListNum<Main.TotalListNum)
-								         Main.RealListNum++;
-								    else if (Main.RealListNum==Main.TotalListNum)
-							             Main.RealListNum=1;
-						            Main.ProgEDITAt=true;
-								    Main.ProgEDITFlip=1;
-									Main.ProgramNum = Convert.ToInt32(Main.FileNameList[Main.RealListNum - 1].Trim('O'));
-									Main.current_filenum = Main.RealListNum;
-									Main.current_filename = Main.FileNameList[Main.RealListNum - 1].ToString();
-									Main.ProgEDITProg = true;
-									Main.ProgEDITList = false;
-									Main.CodeForAll.Clear();
-									Main.RealCodeNum = 1;
-									Main.HorizontalNum = 1;
-									Main.VerticalNum = 1;
-									string S_Line = "";
-									FileStream faceInfoFile;
-									FileInfo ExistCheck = new FileInfo(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".txt");
-									if(ExistCheck.Exists)	
-										faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".txt", FileMode.Open, FileAccess.Read);
-									else 
-									{
-										ExistCheck = new FileInfo(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".cnc");
-										if(ExistCheck.Exists)
-											faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".cnc", FileMode.Open, FileAccess.Read);
-										else
-											faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".nc", FileMode.Open, FileAccess.Read);
-									}
-									StreamReader s_R = new StreamReader(faceInfoFile);
-									S_Line =s_R .ReadLine();
-									while(S_Line != null)
-									{
-										Main.CodeForAll.Add(S_Line.ToUpper().Trim().Trim(';', '；'));
-										S_Line = s_R.ReadLine();
-									}
-									s_R.Close();
-									if(Main.CodeForAll[Main.CodeForAll.Count - 1] == "")
-										Main.CodeForAll.RemoveAt(Main.CodeForAll.Count - 1);
-									Main.TotalCodeNum = Main.CodeForAll.Count;
-									CodeEdit();
-									Main.ProgEDITCusorH = 32f;
-									Main.ProgEDITCusorV = 100f;
-									Main.EDITText.text = Main.TempCodeList[0][0];
-									Main.TextSize = Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
-							        Main.InputText="";
-						            Main.ProgEDITCusorPos = 57f;	
-							
-								}
-						}
+					if(Main.InputText.StartsWith("O"))
+					{
+						Softkey_Script.O_Search();
+						Softkey_Script.Locate_At_Position(Main.RealListNum);
+					}
+					else
+					{
+						bool NumInNine = false;
+						EditProgDown(NumInNine);
 					}
 				}
+				//O检索时
+				//分为两种情况：光标选择模式开或者关
+				//当光标模式关时，如果有输入，且以"O"开始，则进行相应的O检索操作；
+				//Todo: 当光标模式开时，上下移动光标；
+				if(Main.ProgEDITList)
+				{
+					if(Main.InputText.StartsWith("O"))
+					{
+						Softkey_Script.O_Search();
+						Softkey_Script.Locate_At_Position(Main.RealListNum);
+					}	
+				}
 			}
-		}//增加内容到此
-								
-							
-						
-					
+		}
 		
 		if(Main.SettingMenu)
 		{
@@ -2709,13 +2321,13 @@ public class MDIEditModule : MonoBehaviour {
 			if(Main.OffSetCoo)
 			{
 				CooSystem_script.Down();
-			}
-			
-			
+			}	
 		}
 	}
 	
-	
+	/// <summary>
+	/// 光标上移，不好意思，恶心的代码待修改
+	/// </summary>
 	void EditProgUp (bool NumInNine) {
 		
 		if(Main.RealCodeNum > 1)
@@ -3002,7 +2614,9 @@ public class MDIEditModule : MonoBehaviour {
 		}	
 	}
 	
-	
+	/// <summary>
+	/// 光标右移，不好意思，恶心的代码待修改
+	/// </summary>
 	void EditProgRight () 
 	{
 		string[] CurrentRowStr = Main.TempCodeArray[Main.VerticalNum - 1].TrimEnd().Split(' ');
@@ -3485,6 +3099,9 @@ public class MDIEditModule : MonoBehaviour {
 		}	
 	}
 	
+	/// <summary>
+	/// 光标下移，不好意思，恶心的代码待修改
+	/// </summary>
 	void EditProgDown (bool NumInNine) {
 		
 		if(Main.TotalCodeNum > Main.RealCodeNum)

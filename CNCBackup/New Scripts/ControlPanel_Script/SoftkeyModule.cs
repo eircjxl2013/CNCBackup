@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class SoftkeyModule : MonoBehaviour {
 	ControlPanel Main;
@@ -13,7 +14,17 @@ public class SoftkeyModule : MonoBehaviour {
 	MDIInputModule MDIInput_Script;
 	bool preSetSelected=false;
 	//位置界面功能完善---宋荣 ---03.09
-
+	//Improvement for the RPOG part by Eric---03.28
+	string document_path = "";
+	bool file_open = false;
+	public bool EditList_display_switcher = false;
+	//Improvement for the RPOG part by Eric---03.28
+	
+	void Awake ()
+	{
+		document_path = Application.dataPath + "/Resources/Gcode/";
+	}
+	
 	// Use this for initialization
 	void Start () {
 		Main = gameObject.GetComponent<ControlPanel>();
@@ -23,6 +34,7 @@ public class SoftkeyModule : MonoBehaviour {
 		Pos_Script=gameObject.GetComponent<PositionModule>();
 	    MDIInput_Script=gameObject.GetComponent<MDIInputModule>();
 		//位置界面功能完善---宋荣 ---03.09
+		FileInfoInitialize();
 	}
 	
 	public void Softkey () 
@@ -155,10 +167,6 @@ public class SoftkeyModule : MonoBehaviour {
 						Main.ProgEDITProg = true;
 						Main.ProgEDITList = false;
 					}
-					else if(Main.ProgEDITFlip == 2)
-						Main.ProgEDITFlip = 1;
-					else if(Main.ProgEDITFlip == 3)
-						Main.ProgEDITFlip = 2;
 				}
 			}
 		}
@@ -315,8 +323,7 @@ public class SoftkeyModule : MonoBehaviour {
 						}
 						
 						if(MDIInput_Script.isYSelected)
-						{
-							
+						{		
 							CooSystem_script.relative_pos.y=0;
 							Debug.Log("归零Y成功");
 						}
@@ -339,12 +346,9 @@ public class SoftkeyModule : MonoBehaviour {
 		}
 		//程序界面时按下
 		if(Main.ProgMenu)
-		{
+		{//1 level
 			if(Main.ProgEDIT)
-			{
-				//内容--程序菜单下，第二个按钮也是有功能的
-				//姓名--刘旋
-				//日期2013-3-14
+			{//2 level
 				if(Main.ProgEDITProg)
 				{
 					if (Main.ProgEDITFlip==2)
@@ -354,607 +358,31 @@ public class SoftkeyModule : MonoBehaviour {
 						Main.ProgEDITList=true;
 						Main.ProgEDITProg=false ;
 					}	
-					//内容--打开一个程序后，按”O检索“直接打开下一个程序，当前显示程序如果是最后一个程序，则打开第一个程序
-					//姓名--刘旋，时间--2013-3-21
+					//O检索
 					else if(Main.ProgEDITFlip==1)
 					{
-						if(Main.RealListNum<Main.TotalListNum)
-							Main.RealListNum++;
-						else if (Main.RealListNum==Main.TotalListNum)
-							Main.RealListNum=1;
-						if(Main.FileNameList[Main.RealListNum-1].ToCharArray()[0]=='O')
-						{
-							char[] temp_name=Main.FileNameList[Main.RealListNum-1].ToString().ToCharArray ();
-							bool normal_flag=false;
-							for (int q=0;q<temp_name.Length;q++)
-							{
-								if(temp_name[q]=='O'||(temp_name[q]>='0'&&temp_name[q]<='9'))
-								{
-									normal_flag=true;
-								    continue;
-								}
-								else
-								{
-									normal_flag=false;
-									break;
-								}
-							}
-							if(normal_flag)
-							{
-								Main.ProgramNum=Convert.ToInt32(Main.FileNameList[Main.RealListNum-1].Trim('O'));
-								Main.current_filenum=Main.RealListNum;
-								Main.current_filename=Main.FileNameList[Main.RealListNum-1].ToString();
-								Main.CodeForAll.Clear();
-								Main.RealCodeNum=1;
-								Main.HorizontalNum=1;
-								Main.VerticalNum=1;
-								String SLine="";
-								FileStream faceInfoFile;
-								FileInfo ExistCheck=new FileInfo(Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".txt");
-								if(ExistCheck.Exists)
-									faceInfoFile=new FileStream (Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".txt",FileMode.Open,FileAccess.Read);
-								else
-								{
-									ExistCheck=new FileInfo(Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".cnc");
-									if (ExistCheck.Exists)
-										faceInfoFile=new FileStream (Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".cnc",FileMode.Open,FileAccess.Read);
-									else
-										faceInfoFile=new FileStream (Application.dataPath+"/Resources/Gcode/"+Main.FileNameList[Main.RealListNum-1]+".nc",FileMode.Open,FileAccess.Read); 			
-								}
-								StreamReader sR=new StreamReader (faceInfoFile );
-								SLine=sR.ReadLine();
-								while(SLine!=null)
-								{
-									Main.CodeForAll.Add(SLine.ToUpper().Trim().Trim(';','；'));
-									SLine=sR.ReadLine();
-								}
-								sR.Close();
-								if(Main.CodeForAll[Main.CodeForAll.Count-1]=="")
-									Main.CodeForAll.RemoveAt(Main.CodeForAll.Count-1);
-								Main.TotalCodeNum=Main.CodeForAll.Count;
-								MDIEdit_Script.CodeEdit();
-								Main.ProgEDITCusorH=32f;
-								Main.ProgEDITCusorV=100f;
-								Main.EDITText.text=Main.TempCodeList[0][0];
-								Main.TextSize=Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
-							}
-							else Debug.Log("Program name is ilegal!");
-						}
-						else Debug.Log("Program name is ilegal!");//增加内容到此
+						O_Search();
+						Locate_At_Position(Main.RealListNum);
 					}
 				}
 				if(Main.ProgEDITList)
-				{//变化内容到此
+				{
 					if(Main.ProgEDITFlip == 0)
 					{
-						//列表
-						if(Main.current_filenum > 0)
-							Main.RealListNum = Main.current_filenum;
-						else
-							Main.RealListNum = 1;
-						//Main.ProgEDITCusor = 175f;
-						Main.FileNameList.Clear();
-						Main.FileSizeList.Clear();
-						Main.FileDateList.Clear();
-						Main.ProgUnusedNum = 400;
-						Main.ProgUnusedSpace = 512;//内容--内存总容量为512K，姓名--刘旋，时间--2013-3-180;
-						Main.ProgUsedNum = 0;
-						Main.ProgUsedSpace = 0;
-						FileInfo FileTestExtension;	
-						string[] TempFileList = Directory.GetFiles(Application.dataPath + "/Resources/Gcode/");
-						string TestStr = "";
-						string[] TempStrArray;
-						string[] TempNameArray = new string[8];
-						int[] TempSizeArray = new int[8];
-						string[] TempDateArray = new string[8];
-						//int Eight = 0;
-						for(int i = 0; i < TempFileList.Length; i++)
+						if(Main.at_position >= 0)
 						{
-							FileTestExtension = new FileInfo(TempFileList[i]);
-							TestStr = FileTestExtension.Extension.ToUpper();
-							if(TestStr == ".CNC" || TestStr == ".NC" || TestStr == ".TXT")
-							{
-								TempStrArray = TempFileList[i].Split('/');
-								TempStrArray = TempStrArray[TempStrArray.Length - 1].Split('.');
-								char[] temp_name = TempStrArray[0].ToString().ToCharArray();
-								bool normal_flag = true;
-								for(int q = 0; q < temp_name.Length; q++)
-								{
-									if(temp_name[q] == 'O' || (temp_name[q] >= '0' && temp_name[q] <= '9'))
-										continue;
-									else
-									{
-										normal_flag = false;
-										break;
-									}
-								}
-								if(normal_flag)
-								{
-									Main.FileNameList.Add(TempStrArray[0]);
-									//内容--文件大小修改,0B转化为0K，1B-1024B转化为1K，1025B-2048B转化为2K。。。
-									//姓名--刘旋，时间--2013-3-21
-									int temp_num=0;
-									temp_num=(Int32)FileTestExtension.Length;	
-									if(temp_num>0)
-											temp_num=(temp_num+1023)/1024;		
-									Main.FileSizeList.Add(temp_num);
-									Main.ProgUsedNum++;
-									Main.ProgUsedSpace +=  temp_num;
-									Main.FileDateList.Add(FileTestExtension.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
-								}
-							}	
+							Locate_At_Position(Main.RealListNum);
 						}
-						Main.TotalListNum = Main.FileNameList.Count;
-						//内容--对于某一程序号，只在特定的位置显示
-						//姓名--刘旋，时间--2-13-3-21
-						int middle_num=0;
-						middle_num=Main.RealListNum%8;
-						switch(middle_num)
-						{
-							case 1:
-								Main.ProgEDITCusor =175f;
-								break;
-							case 2:
-								Main.ProgEDITCusor =195f;
-								break;
-							case 3:
-								Main.ProgEDITCusor =215f;
-								break;
-							case 4:
-								Main.ProgEDITCusor =235f;
-								break;
-							case 5:
-								Main.ProgEDITCusor =255f;
-								break;
-							case 6:
-								Main.ProgEDITCusor =275f;
-								break;
-							case 7:
-								Main.ProgEDITCusor =295f;
-								break;
-							case 0:
-								Main.ProgEDITCusor =315f;
-								break;	
-						}
-						//Main.ProgEDITAt=true;
-						int currentpage=(Main.RealListNum-1)/8;	
-						int startnum=currentpage*8+1;	
-						int finalnum=currentpage*8+8;
-						//增加内容到此
-						if(finalnum >Main.TotalListNum)				
-							finalnum=Main.TotalListNum;	
-
-						for(int i = 0; i < 8; i++)
-						{
-							TempNameArray[i] = "";
-							TempSizeArray[i] = 0;
-							TempDateArray[i] = "";
-						}
-						int array_index = -1;
-						for(int i = startnum-1; i < finalnum; i++)
-						{
-							array_index++;
-							TempNameArray[array_index] = Main.FileNameList[i];
-							TempSizeArray[array_index] = Main.FileSizeList[i];
-							TempDateArray[array_index] = Main.FileDateList[i];
-						}
-						
-						Main.CodeName01 = TempNameArray[0];
-						Main.CodeName02 = TempNameArray[1];
-						Main.CodeName03 = TempNameArray[2];
-						Main.CodeName04 = TempNameArray[3];
-						Main.CodeName05 = TempNameArray[4];
-						Main.CodeName06 = TempNameArray[5];
-						Main.CodeName07 = TempNameArray[6];
-						Main.CodeName08 = TempNameArray[7];
-						
-						Main.CodeSize01 = TempSizeArray[0];
-						Main.CodeSize02 = TempSizeArray[1];
-						Main.CodeSize03 = TempSizeArray[2];
-						Main.CodeSize04 = TempSizeArray[3];
-						Main.CodeSize05 = TempSizeArray[4];
-						Main.CodeSize06 = TempSizeArray[5];
-						Main.CodeSize07 = TempSizeArray[6];
-						Main.CodeSize08 = TempSizeArray[7];
-						
-						Main.UpdateDate01 = TempDateArray[0];
-						Main.UpdateDate02 = TempDateArray[1];
-						Main.UpdateDate03 = TempDateArray[2];
-						Main.UpdateDate04 = TempDateArray[3];
-						Main.UpdateDate05 = TempDateArray[4];
-						Main.UpdateDate06 = TempDateArray[5];
-						Main.UpdateDate07 = TempDateArray[6];
-						Main.UpdateDate08 = TempDateArray[7];
-						
-						Main.ProgUnusedNum -= Main.ProgUsedNum;
-						Main.ProgUnusedSpace -= Main.ProgUsedSpace;
-						Main.ProgEDITProg = false;
-						Main.ProgEDITList = true;
 					}
-				
 					if(Main.ProgEDITFlip == 1)
 					{
 						//O检索
-						if(Main.ProgEDITList)
-						{
-							if ((Main.InputText.Length <6)&&(Main.InputText.Length>1))//内容--MDI键盘输入程序名称，按下“O检索”，实现对程序的选择，姓名--刘旋，时间--2013-3-20
-							{   
-								
-								if (Main.InputText[0]!='O')
-								{
-									Main.InputText="";
-									Main .ProgEDITCusorPos=57f;
-								}
-								
-								else 
-								{
-								char[] temp_name=Main.InputText.ToCharArray ();
-								bool normal_flag=true;
-								for(int j=0;j<temp_name.Length ;j++)
-								{
-									if(temp_name[j] == 'O' || (temp_name[j] >= '0' && temp_name[j] <= '9'))
-									    continue;
-								    else
-								       {
-									      normal_flag = false;
-									      break;
-								       }
-								}
-									if(normal_flag)
-									{
-										int inputname = Convert.ToInt32(Main.InputText.Trim('O'));
-										String tempinput_name=Main.ToolNumFormat(inputname);
-										String input_name='O'+tempinput_name;
-										int m=0;
-										while(input_name!=Main.FileNameList[m])
-									{
-										m++;
-									}
-									Main.RealListNum=m+1;
-									Main.ProgramNum = Convert.ToInt32(Main.FileNameList[Main.RealListNum - 1].Trim('O'));
-									if (Main.ProgEDITFlip==0)
-										Main.ProgEDITFlip=1;
-									//内容--对于某一程序号，只在特定的位置显示
-					               //姓名--刘旋，时间--2-13-3-21
-									int middle_num=0;
-									middle_num=Main.RealListNum%8;
-									switch(middle_num)
-									{
-									case 1:
-										Main.ProgEDITCusor=175f;
-										break;
-									case 2:
-										Main.ProgEDITCusor=195f;
-										break;
-									case 3:
-										Main.ProgEDITCusor=215f;
-										break;
-									case 4:
-										Main.ProgEDITCusor=235f;
-										break;
-									case 5:
-										Main.ProgEDITCusor=255f;
-										break;
-									case 6:
-										Main.ProgEDITCusor=275f;
-										break;
-									case 7:
-										Main.ProgEDITCusor=295f;
-										break;
-									case 0:
-										Main.ProgEDITCusor=315f;
-										break;
-											
-									}
-									Main.ProgEDITAt=true;
-									int currentpage=(Main.RealListNum-1)/8;
-									int startnum=currentpage*8+1;
-									int finalnum=currentpage*8+8;
-									//增加内容到此
-									Main.ProgEDITAt=true;
-									if(finalnum >Main.TotalListNum)
-										finalnum=Main.TotalListNum;
-									string[] InputNameArray = new string[8];
-							        int[] InputSizeArray = new int[8];
-							        string[] InputDateArray = new string[8];
-							        for(int i = 0; i < 8; i++)
-							        {
-								      InputNameArray[i] = "";
-								      InputSizeArray[i] = 0;
-								      InputDateArray[i] = "";
-							        }
-							        int MiddleNum = -1;
-							        for(int i = startnum; i < finalnum+1 ; i++)
-							        {
-								       MiddleNum++;
-								       InputNameArray[MiddleNum] = Main.FileNameList[i-1];	
-								       InputSizeArray[MiddleNum] = Main.FileSizeList[i-1];
-								       InputDateArray[MiddleNum] = Main.FileDateList[i-1];
-							        }
-							
-							Main.CodeName01 = InputNameArray[0];
-							Main.CodeName02 = InputNameArray[1];
-							Main.CodeName03 = InputNameArray[2];
-							Main.CodeName04 = InputNameArray[3];
-							Main.CodeName05 = InputNameArray[4];
-							Main.CodeName06 = InputNameArray[5];
-							Main.CodeName07 = InputNameArray[6];
-							Main.CodeName08 = InputNameArray[7];
-							
-							Main.CodeSize01 = InputSizeArray[0];
-							Main.CodeSize02 = InputSizeArray[1];
-							Main.CodeSize03 = InputSizeArray[2];
-							Main.CodeSize04 = InputSizeArray[3];
-							Main.CodeSize05 = InputSizeArray[4];
-							Main.CodeSize06 = InputSizeArray[5];
-							Main.CodeSize07 = InputSizeArray[6];
-							Main.CodeSize08 = InputSizeArray[7];
-							
-							Main.UpdateDate01 = InputDateArray[0];
-							Main.UpdateDate02 = InputDateArray[1];
-							Main.UpdateDate03 = InputDateArray[2];
-							Main.UpdateDate04 = InputDateArray[3];
-							Main.UpdateDate05 = InputDateArray[4];
-							Main.UpdateDate06 = InputDateArray[5];
-							Main.UpdateDate07 = InputDateArray[6];
-							Main.UpdateDate08 = InputDateArray[7];
-										
-										
-									}
-								Main.InputText="";
-						        Main.ProgEDITCusorPos = 57f;	
-								}
-							}
-						else
-					   {	
-								
-						Main.InputText="";
-						Main.ProgEDITCusorPos=57f;//增加内容到此
-							if(Main.FileNameList.Count == 0)
-								Debug.Log("No files in the memory now!");
-							else
-							{
-								if(Main.FileNameList[Main.RealListNum - 1].ToCharArray()[0] == 'O')
-								{
-									char[] temp_name = Main.FileNameList[Main.RealListNum - 1].ToString().ToCharArray();
-									bool normal_flag = true;
-									for(int q = 0; q < temp_name.Length; q++)
-									{
-										if(temp_name[q] == 'O' || (temp_name[q] >= '0' && temp_name[q] <= '9'))
-											continue;
-										else
-										{
-											normal_flag = false;
-											break;
-										}
-									}
-									if(normal_flag)
-									{
-										Main.ProgramNum = Convert.ToInt32(Main.FileNameList[Main.RealListNum - 1].Trim('O'));
-										Main.current_filenum = Main.RealListNum;
-										Main.current_filename = Main.FileNameList[Main.RealListNum - 1].ToString();
-										Main.ProgEDITProg = true;
-										Main.ProgEDITList = false;
-										Main.CodeForAll.Clear();
-										Main.RealCodeNum = 1;
-										Main.HorizontalNum = 1;
-										Main.VerticalNum = 1;
-										string SLine = "";
-										FileStream faceInfoFile;
-										FileInfo ExistCheck = new FileInfo(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".txt");
-										if(ExistCheck.Exists)	
-											faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".txt", FileMode.Open, FileAccess.Read);
-										else 
-										{
-											ExistCheck = new FileInfo(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".cnc");
-											if(ExistCheck.Exists)
-												faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".cnc", FileMode.Open, FileAccess.Read);
-											else
-												faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".nc", FileMode.Open, FileAccess.Read);
-										}
-										StreamReader sR = new StreamReader(faceInfoFile);
-										SLine = sR.ReadLine();
-										while(SLine != null)
-										{
-											Main.CodeForAll.Add(SLine.ToUpper().Trim().Trim(';', '；'));
-											SLine = sR.ReadLine();
-										}
-										sR.Close();
-										if(Main.CodeForAll[Main.CodeForAll.Count - 1] == "")
-											Main.CodeForAll.RemoveAt(Main.CodeForAll.Count - 1);
-										Main.TotalCodeNum = Main.CodeForAll.Count;
-										MDIEdit_Script.CodeEdit();
-										Main.ProgEDITCusorH = 32f;
-										Main.ProgEDITCusorV = 100f;
-										Main.EDITText.text = Main.TempCodeList[0][0];
-										Main.TextSize = Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
-									}
-									else
-										Debug.Log("Program name is ilegal!");
-								}
-								else	
-									Debug.Log("Program name is ilegal!");
-							}}
-						}
-						else
-						{
-							if(Main.FileNameList.Count == 0)
-							{
-								FileStream prog_file;
-								string[] TempFileList = Directory.GetFiles(Application.dataPath + "/Resources/Gcode/");
-								if(TempFileList.Length > 0)
-								{
-									string TestStr = "";
-									string[] TempStrArray;
-									FileInfo FileTestExtension;	
-									Main.FileNameList.Clear();
-									Main.FileSizeList.Clear();
-									Main.FileDateList.Clear();
-									for(int i = 0; i < TempFileList.Length; i++)
-									{
-										FileTestExtension = new FileInfo(TempFileList[i]);
-										TestStr = FileTestExtension.Extension.ToUpper();
-										if(TestStr == ".CNC" || TestStr == ".NC" || TestStr == ".TXT")
-										{
-											TempStrArray = TempFileList[i].Split('/');
-											TempStrArray = TempStrArray[TempStrArray.Length - 1].Split('.');
-											char[] temp_name = TempStrArray[0].ToString().ToCharArray();
-											bool normal_flag = true;
-											for(int q = 0; q < temp_name.Length; q++)
-											{
-												if(temp_name[q] == 'O' || (temp_name[q] >= '0' && temp_name[q] <= '9'))
-													continue;
-												else
-												{
-													normal_flag = false;
-													break;
-												}
-											}
-											if(normal_flag)
-											{
-												Main.FileNameList.Add(TempStrArray[0]);
-												//内容--文件大小修改,0B转化为0K，1B-1024B转化为1K，1025B-2048B转化为2K。。。
-												//姓名--刘旋，时间--2013-3-21
-	     										int temp=0;
-												temp=(Int32)FileTestExtension.Length;
-												if(temp>0)
-														temp=(temp+1023)/1024;
-												Main.FileSizeList.Add(temp);
-												Main.ProgUsedNum++;
-												Main.ProgUsedSpace +=  temp;
-												Main.FileDateList.Add(FileTestExtension.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
-											}						
-										}	
-									}
-									for(int a = 0; a < TempFileList.Length; a++)
-									{
-										string directory_str = TempFileList[a].ToString().ToUpper();
-										TempStrArray = directory_str.Split('/');
-										string[] prog_num = TempStrArray[TempStrArray.Length - 1].ToString().Split('.');
-										char[] temp_name = prog_num[0].ToString().ToCharArray();
-										bool normal_flag = true;
-										for(int q = 0; q < temp_name.Length; q++)
-										{
-											if(temp_name[q] == 'O' || (temp_name[q] >= '0' && temp_name[q] <= '9'))
-												continue;
-											else
-											{
-												normal_flag = false;
-												break;
-											}
-										}
-										if(normal_flag)
-										{
-											Main.ProgramNum = Convert.ToInt32(prog_num[0].ToString().Trim('O'));
-											if(TempStrArray[TempStrArray.Length - 1].StartsWith("O"))
-											{
-												if(TempStrArray[TempStrArray.Length - 1].ToString().EndsWith(".TXT") || TempStrArray[TempStrArray.Length - 1].ToString().EndsWith(".CNC") || TempStrArray[TempStrArray.Length - 1].ToString().EndsWith(".NC"))
-												{
-													prog_file = new FileStream(Application.dataPath + "/Resources/Gcode/" + TempStrArray[TempStrArray.Length - 1], FileMode.Open, FileAccess.Read);
-													StreamReader sR = new StreamReader(prog_file);
-													string SLine = "";
-													SLine = sR.ReadLine();
-													while(SLine != null)
-													{
-														Main.CodeForAll.Add(SLine.ToUpper().Trim().Trim(';', '；'));
-														SLine = sR.ReadLine();
-													}
-													sR.Close();
-													if(Main.CodeForAll[Main.CodeForAll.Count - 1] == "")
-														Main.CodeForAll.RemoveAt(Main.CodeForAll.Count - 1);
-													Main.TotalCodeNum = Main.CodeForAll.Count;
-													MDIEdit_Script.CodeEdit();
-													Main.ProgEDITCusorH = 32f;
-													Main.ProgEDITCusorV = 100f;
-													Main.current_filenum = a + 1;
-													Main.current_filename = prog_num[0];
-													Main.EDITText.text = Main.TempCodeList[0][0];
-													Main.TextSize = Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
-													break;
-												}
-											}
-										}	
-									}
-								}
-								else
-									Debug.Log("No files in the memory now!");
-						}
-						else
-						{
-							if(Main.current_filenum < Main.FileNameList.Count)
-							{
-								Main.current_filenum++;
-								Main.RealListNum = Main.current_filenum;
-							}
-							else
-							{
-								Main.RealListNum = 1;
-								Main.current_filenum = 1;
-							}
-							if(Main.FileNameList[Main.RealListNum - 1].ToCharArray()[0] == 'O')
-							{
-								char[] temp_name = Main.FileNameList[Main.RealListNum - 1].ToString().ToCharArray();
-								bool normal_flag = true;
-								for(int q = 0; q < temp_name.Length; q++)
-								{
-									if(temp_name[q] == 'O' || (temp_name[q] >= '0' && temp_name[q] <= '9'))
-										continue;
-									else
-									{
-										normal_flag = false;
-										break;
-									}
-								}
-								if(normal_flag)
-								{
-									Main.ProgramNum = Convert.ToInt32(Main.FileNameList[Main.RealListNum - 1].Trim('O'));
-									Main.ProgEDITProg = true;
-									Main.ProgEDITList = false;
-									Main.CodeForAll.Clear();
-									Main.RealCodeNum = 1;
-									Main.HorizontalNum = 1;
-									Main.VerticalNum = 1;
-									string SLine = "";
-									FileStream faceInfoFile;
-									FileInfo ExistCheck = new FileInfo(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".txt");
-									if(ExistCheck.Exists)	
-										faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".txt", FileMode.Open, FileAccess.Read);
-									else 
-									{
-										ExistCheck = new FileInfo(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".cnc");
-										if(ExistCheck.Exists)
-											faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".cnc", FileMode.Open, FileAccess.Read);
-										else
-											faceInfoFile = new FileStream(Application.dataPath + "/Resources/Gcode/" + Main.FileNameList[Main.RealListNum - 1] + ".nc", FileMode.Open, FileAccess.Read);
-									}
-									StreamReader sR = new StreamReader(faceInfoFile);
-									SLine = sR.ReadLine();
-									while(SLine != null)
-									{
-										Main.CodeForAll.Add(SLine.ToUpper().Trim().Trim(';', '；'));
-										SLine = sR.ReadLine();
-									}
-									sR.Close();
-									if(Main.CodeForAll[Main.CodeForAll.Count - 1] == "")
-										Main.CodeForAll.RemoveAt(Main.CodeForAll.Count - 1);
-									Main.TotalCodeNum = Main.CodeForAll.Count;
-									MDIEdit_Script.CodeEdit();
-									Main.ProgEDITCusorH = 32f;
-									Main.ProgEDITCusorV = 100f;
-									Main.EDITText.text = Main.TempCodeList[0][0];
-									Main.TextSize = Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
-								}
-								else
-									Debug.Log("Program name is ilegal!");
-							}
-							else	
-								Debug.Log("Program name is ilegal!");	
-						}
-					}	
+						O_Search();	
+						Locate_At_Position(Main.RealListNum);
+					}
 				}
-			}
-		}
-		}
+			}//2 level
+		}//1 level
 		
 		if(Main.SettingMenu)
 		{
@@ -1236,9 +664,11 @@ public class SoftkeyModule : MonoBehaviour {
 				if(Main.ProgEDITList)
 				{
 					if(Main.ProgEDITFlip == 1)
+					{
 						Main.ProgEDITFlip = 2;
-					else if(Main.ProgEDITFlip == 2)
-						Main.ProgEDITFlip = 3;
+						Main.ProgEDITProg = true;
+						Main.ProgEDITList = false;
+					}
 				}
 			}
 		}
@@ -1269,6 +699,312 @@ public class SoftkeyModule : MonoBehaviour {
 					Main.OffSetOne = false;
 				}
 			}
+		}
+	}
+	
+	/// <summary>
+	/// 获取当前目录下符合要求的文件的文件名
+	/// </summary>
+	public void FileInfoInitialize ( )
+	{
+		//Judge whether the file directory is right or not
+		if(Directory.Exists(document_path))
+		{
+			string temp_name = "";
+			if(Main.current_filenum > 0)
+				Main.RealListNum = Main.current_filenum;
+			else
+				Main.RealListNum = 1;
+			//Main.ProgEDITCusor = 175f;
+			//考虑到可能增减程序的情况，如果当前有打开程序，先记录下当前的程序号
+			if(Main.FileNameList.Count > 0)
+				temp_name = Main.FileNameList[Main.RealListNum - 1];
+			Main.FileNameList.Clear();
+			Main.FileSizeList.Clear();
+			Main.FileDateList.Clear();
+			Main.ProgUnusedNum = 400;
+			Main.ProgUnusedSpace = 512;//内容--内存总容量为512K，姓名--刘旋，时间--2013-3-180;
+			Main.ProgUsedNum = 0;
+			Main.ProgUsedSpace = 0;
+			//Acquire all of the files's name under current directory.
+			string[] tempFileList = Directory.GetFiles(document_path);
+			if(tempFileList.Length > 0)
+			{// 10 level
+				FileInfo get_fileinfo;
+				int fileSize = 0;
+				foreach(string fullname in tempFileList)
+				{
+					//Regular Expression: 判断文件路径中是否包含指定格式的字符串："O"+"4个数字"+"."+"2或3个字符结尾"
+					Regex fullname_Reg = new Regex(@"O\d{4}.\w{2,3}$");
+					//Get files's information
+					if(fullname_Reg.IsMatch(fullname))
+					{
+						Main.FileNameList.Add(fullname_Reg.Match(fullname).Value.Substring(0,5));
+						get_fileinfo = new FileInfo(fullname);
+						Main.FileDateList.Add(get_fileinfo.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
+						fileSize = (int)(get_fileinfo.Length / 1024);
+						if(fileSize * 1204 < get_fileinfo.Length)
+							fileSize++;
+						Main.FileSizeList.Add(fileSize);
+						Main.ProgUnusedSpace += fileSize;
+					}
+				}
+				//Initialize some arquments for display
+				Main.TotalListNum = Main.FileNameList.Count;
+				Main.ProgUsedNum = Main.TotalListNum;
+				Main.ProgUnusedNum -= Main.ProgUsedNum;
+				Main.ProgUnusedSpace -= Main.ProgUsedSpace;
+				//考虑到程序有增减的可能性，重新定义位置参数 Main.RealListNum
+				if(temp_name != "")
+				{
+					if(Main.FileNameList.IndexOf(temp_name) != -1)
+						Main.RealListNum = Main.FileNameList.IndexOf(temp_name) + 1;
+					else
+					{
+						Main.RealListNum = 1;
+						Main.at_position = -1;
+						Main.at_page_number = -1;
+					}
+				}
+				string[] TempNameArray = new string[8];
+				int[] TempSizeArray = new int[8];
+				string[] TempDateArray = new string[8];
+				for(int i = 0; i < 8; i++)
+				{
+					TempNameArray[i] = "";
+					TempSizeArray[i] = 0;
+					TempDateArray[i] = "";
+				}
+				int currentpage=(Main.RealListNum-1)/8;	
+				int startnum=currentpage*8+1;	
+				int finalnum=currentpage*8+8;
+				if(finalnum >Main.TotalListNum)				
+					finalnum=Main.TotalListNum;	
+				int initial_index = -1;
+				for(int i = startnum - 1; i < finalnum; i++)
+				{
+					initial_index++;
+					TempNameArray[initial_index] = Main.FileNameList[i];
+					TempSizeArray[initial_index] = Main.FileSizeList[i];
+					TempDateArray[initial_index] = Main.FileDateList[i];
+				}
+				for(int i = 0; i < 8; i++)
+				{
+					Main.CodeName[i] = TempNameArray[i];
+					Main.CodeSize[i] = TempSizeArray[i];
+					Main.UpdateDate[i] = TempDateArray[i];
+				}
+			}// 10 level
+			else
+				Debug.LogWarning("Can't find any file in current working directory. 	Warning caused by Eric.");
+		}
+		else
+			Debug.LogError("The file directory doesn't exist. 	Error caused by Eric.");
+	}
+	
+	/// <summary>
+	/// 加载相应路径下的NC文件，并以List<string>类型返回该文件中的所有NC代码
+	/// --1--调用了NCFileList函数，获得当前目录下所有符合要求的文件的文件名
+	/// --2--上一步操作在这里显得有点多余，其实是因为数控面板中的程序列表可以显示存储器中的文件信息，这是为改善那一步准备的
+	/// </summary>
+	/// <returns>
+	/// 该NC程序文件中的所有NC代码，返回类型：List<string>
+	/// </returns>
+	/// <param name='filename'>
+	/// NC程序的程序名
+	/// </param>
+	public List<string> CodeLoad (string filename)
+	{
+		List<string> original_code = new List<string>();
+		bool success_open = true;
+		List<string> file_name_list = Main.FileNameList; 
+		if(file_name_list.Count > 0)
+		{//1 level
+			//Judge whether the input string is right or not.
+			if(filename.StartsWith("O"))
+			{//2 level
+				string temp_name = filename.Trim('O');
+				//Regular Expression: 判断输入的是否为数字字符，且大小在(0,10000)之间
+				Regex name_Reg = new Regex(@"^\d{1,4}$");
+				if(name_Reg.IsMatch(temp_name))
+				{//3 level
+					int name_num = Convert.ToInt32(temp_name);
+					if(name_num > 0 && name_num < 10)
+						temp_name = "O000" + name_num.ToString();
+					else if(name_num >= 10 && name_num < 100 )
+						temp_name = "O00" + name_num.ToString();
+					else if(name_num >= 100 && name_num < 1000)
+						temp_name = "O0" + name_num.ToString();
+					else
+						temp_name = "O" + name_num.ToString();
+					if(file_name_list.IndexOf(temp_name) >= 0)
+					{//4 level
+						string file_path = "";
+						FileInfo exist_check = new FileInfo(document_path + temp_name + ".txt");
+						if(exist_check.Exists)
+							file_path = document_path + temp_name + ".txt";
+						else
+						{
+							exist_check = new FileInfo(document_path + temp_name + ".cnc");
+							if(exist_check.Exists)
+								file_path = document_path + temp_name + ".cnc";
+							else
+							{
+								exist_check = new FileInfo(document_path + temp_name + ".nc");
+								if(exist_check.Exists)
+									file_path = document_path + temp_name + ".nc";
+								else
+									success_open = false;
+							}
+						}
+						//Acquire original code.
+						if(success_open)
+						{
+							//全局变量
+							Main.RealListNum = file_name_list.IndexOf(temp_name) + 1;
+							Main.ProgramNum = Convert.ToInt32(temp_name.Trim('O'));
+							FileStream code_file_stream = new FileStream(file_path, FileMode.Open, FileAccess.Read); 
+							StreamReader code_SR = new StreamReader(code_file_stream);
+							string s_Line = code_SR.ReadLine();
+							while(s_Line != null)
+							{
+								original_code.Add(s_Line);
+								s_Line = code_SR.ReadLine();
+							}
+							code_SR.Close();
+						}
+						else
+							Debug.LogError("Unexpected error! Program: " + temp_name + " disappears.  Error caused by Eric.");
+					}//4 level
+					else
+						Debug.LogWarning("Can't find Program: " + temp_name + " in current working directory!  Warning caused by Eric.");
+				}//3 level
+				else
+					Debug.LogError("格式错误! Error caused by Eric.");
+			}//2 level
+			else
+				Debug.LogError("格式错误! Error caused by Eric.");
+		}//1 level
+		else
+			Debug.LogWarning("Can't find any file in current working directory. 	Warning caused by Eric.");
+		return original_code;
+	}
+	
+	/// <summary>
+	/// O检索，加载代码，此处需要初步格式化
+	/// </summary>
+	public void O_Search() 
+	{
+		string file_name = "";
+		int temp_reallistnum = Main.RealListNum;
+		bool open_success = false;
+		//无输入或者输入为"O"时
+		if(Main.InputText == "" || Main.InputText == "O")
+		{
+			if(Main.RealListNum < Main.TotalListNum)
+				Main.RealListNum++;
+			else
+				Main.RealListNum=1;
+			if(Main.at_position < 0)
+				Main.RealListNum=1;
+			file_name = Main.FileNameList[Main.RealListNum - 1];
+		}
+		//有合适的输入时
+		else
+		{
+			file_name = Main.InputText;
+		}
+		//从文件加载NC代码
+		List<string> temp_code_list = CodeLoad(file_name);
+		if(temp_code_list.Count > 0)
+		{
+			if(temp_code_list[temp_code_list.Count-1] == "")
+				temp_code_list.RemoveAt(temp_code_list.Count - 1);
+			if(temp_code_list.Count > 0)
+			{
+				Main.CodeForAll.Clear();
+				Main.CodeForAll = new List<string>();
+				Main.CodeForAll = temp_code_list;
+				Main.RealCodeNum=1;
+				Main.HorizontalNum=1;
+				Main.VerticalNum=1;
+				Main.TotalCodeNum=Main.CodeForAll.Count;
+				//待修改的函数，祝你好运
+				MDIEdit_Script.CodeEdit();
+				Main.ProgEDITCusorH=32f;
+				Main.ProgEDITCusorV=100f;
+				Main.EDITText.text=Main.TempCodeList[0][0];
+				Main.TextSize=Main.sty_EDITTextField.CalcSize(new GUIContent(Main.EDITText.text));
+				open_success = true;
+				Main.ProgEDITList = false;
+				Main.ProgEDITProg = true;
+				Main.ProgEDITAt = true;
+				Main.at_position = Main.RealListNum%8;	
+				Main.at_page_number = (Main.RealListNum - 1)/8;
+			}
+		}
+		if(open_success == false)
+		{
+			Main.RealListNum = temp_reallistnum;
+		}
+		Main.InputText="";
+		Main .ProgEDITCusorPos=57f;
+	}
+	
+	/// <summary>
+	/// 确定"@"的位置
+	/// </summary>
+	/// <param name='name_index'>
+	/// 当前所打开的程序在列表中的index
+	/// </param>
+	public void Locate_At_Position (int name_index)
+	{
+		if(Main.at_position >= 0)
+		{
+			Main.at_position = name_index%8;
+			switch(Main.at_position)
+			{
+				case 1:
+					Main.ProgEDITCusor =175f;
+					break;
+				case 2:
+					Main.ProgEDITCusor =195f;
+					break;
+				case 3:
+					Main.ProgEDITCusor =215f;
+					break;
+				case 4:
+					Main.ProgEDITCusor =235f;
+					break;
+				case 5:
+					Main.ProgEDITCusor =255f;
+					break;
+				case 6:
+					Main.ProgEDITCusor =275f;
+					break;
+				case 7:
+					Main.ProgEDITCusor =295f;
+					break;
+				case 0:
+					Main.ProgEDITCusor =315f;
+					break;	
+			}
+			if(Main.CodeName[0] != "")
+			{
+				int current_page = Main.FileNameList.IndexOf(Main.CodeName[0]);
+				if(current_page >= 0)
+				{
+					current_page = current_page / 8; 
+					if(Main.at_page_number != current_page)
+						Main.ProgEDITAt = false;
+					else
+						Main.ProgEDITAt = true;
+				}
+				else
+					Main.ProgEDITAt = false;
+			}
+			else
+				Main.ProgEDITAt = false;
 		}
 	}
 	
