@@ -228,9 +228,9 @@ public class ControlPanel : MonoBehaviour {
 	public bool ProgProtectWarn = false;
 	public Vector2 TextSize = new Vector2(0,0);
 	public bool SettingMenu = false;
-	public bool OffSetTool = false;
+	public bool OffSetTool = true;
 	public bool OffSetSetting = false;
-	public bool OffSetCoo = true;
+	public bool OffSetCoo = false;
 	public bool OffSetOne = true;
 	public bool OffSetTwo = false;
 	public bool OffCooFirstPage = true;
@@ -748,6 +748,9 @@ public class ControlPanel : MonoBehaviour {
 		//设定界面修改---陈振华---03.11
 		
 		sty_EditListTop.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/EditListTop");
+		OffSetTool = true;
+		OffSetSetting = false;
+		OffSetCoo = false;
 	}
 	
 	void OnGUI()
@@ -1618,7 +1621,7 @@ public class ControlPanel : MonoBehaviour {
 	}
 	
 	//设定界面修改---陈振华---03.11
-	//使设定输入右对齐
+	//使设定输入右对齐，顺序号停止参数
 	public string ArguStringGet(string StrValue)
 	{
 		string DisplayStr = "";
@@ -1638,7 +1641,17 @@ public class ControlPanel : MonoBehaviour {
 		DisplayStr = " "+StrValue;
 		return DisplayStr;	
 	}
-
+	
+	//使设定输入右对齐，IO参数
+	public string ArguStringGet_IO(string StrValue)
+	{
+		string DisplayStr = "";
+		if(StrValue.Length == 1)
+			DisplayStr = " "+StrValue;
+		else if(StrValue.Length == 2)
+			DisplayStr = StrValue;
+		return DisplayStr;	
+	}
 
 	string SingleCodeFormat (string OriCode) 
 	{

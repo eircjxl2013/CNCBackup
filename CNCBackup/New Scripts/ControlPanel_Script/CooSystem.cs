@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+using System;
+using System.Text.RegularExpressions;
 
 public class CooSystem : MonoBehaviour {
 	
-	ControlPanel ControlPanel_script;
+	ControlPanel Main;
 	MoveControl MoveControl_script;
 	public Vector3 absolute_pos = new Vector3(0,0,0);
 	public Vector3 relative_pos = new Vector3(0,0,0);
@@ -20,16 +22,15 @@ public class CooSystem : MonoBehaviour {
 	public Vector3 workpiece_coo = new Vector3(0,0,0);
 	
 	//设定界面修改---陈振华---03.11
-	public string parameter = "0";
-	public string TV = "0";
-	public string CKJC = "0";
+	public string parameter_writabel = "1";
+	public string TV_check = "0";
+	public string hole_code = "1";
 	public string input_unit = "0";
 	public string IO = "0";
-	public string order = "0";
-	public string zhidai = "0";
-	public string order_stop1 = "0";
-	public string order_stop2 = "0";
-	public bool show_result = false;
+	public string sequence_number = "0";
+	public string paper_tape = "0";
+	public string SN_stop1 = "0";
+	public string SN_stop2 = "0";
 	//设定界面修改---陈振华---03.11
 	
 	void Awake () {
@@ -38,145 +39,207 @@ public class CooSystem : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		ControlPanel_script = gameObject.GetComponent<ControlPanel>();
+		Main = gameObject.GetComponent<ControlPanel>();
 		MoveControl_script = GameObject.Find("move_control").GetComponent<MoveControl>();
 		ReadCooFile();
 		workpiece_coo = G54_pos;
 		workpiece_flag = 1;
 		
-		//设定界面修改---陈振华---03.11
-		parameter = PlayerPrefs.GetString("parameter");
-        TV = PlayerPrefs.GetString("TV");
-	    CKJC = PlayerPrefs.GetString("CKJC");
-	    input_unit = PlayerPrefs.GetString("input_unit");
-	    IO = PlayerPrefs.GetString("IO");
-	    order = PlayerPrefs.GetString("order");
-	    zhidai = PlayerPrefs.GetString("zhidai");
-	    order_stop1 = PlayerPrefs.GetString("order_stop1");
-	    order_stop2 = PlayerPrefs.GetString("order_stop2");
+		//获得设置界面显示值
+		if(PlayerPrefs.HasKey("parameter_writabel"))
+			parameter_writabel = PlayerPrefs.GetString("parameter_writabel");
+		else
+		{
+			PlayerPrefs.SetString("parameter_writabel", "1");
+			parameter_writabel = "1";
+		}
+		
+		if(PlayerPrefs.HasKey("TV_check"))
+			TV_check = PlayerPrefs.GetString("TV_check");
+		else
+		{
+			PlayerPrefs.SetString("TV_check", "0");
+			TV_check = "0";
+		}
+		
+		if(PlayerPrefs.HasKey("hole_code"))
+			hole_code = PlayerPrefs.GetString("hole_code");
+		else
+		{
+			PlayerPrefs.SetString("hole_code", "1");
+			hole_code = "1";
+		}
+		
+		if(PlayerPrefs.HasKey("input_unit"))
+			input_unit = PlayerPrefs.GetString("input_unit");
+		else
+		{
+			PlayerPrefs.SetString("input_unit", "0");
+			input_unit = "0";
+		}
+		
+		if(PlayerPrefs.HasKey("IO"))
+			IO = PlayerPrefs.GetString("IO");
+		else
+		{
+			PlayerPrefs.SetString("IO", "0");
+			IO = "0";
+		}
+			
+		if(PlayerPrefs.HasKey("sequence_number"))
+			sequence_number = PlayerPrefs.GetString("sequence_number");
+		else
+		{
+			PlayerPrefs.SetString("sequence_number", "0");
+			sequence_number = "0";
+		}
+		
+		if(PlayerPrefs.HasKey("paper_tape"))
+			paper_tape = PlayerPrefs.GetString("paper_tape");
+		else
+		{
+			PlayerPrefs.SetString("paper_tape", "0");
+			paper_tape = "0";
+		}
+		
+		if(PlayerPrefs.HasKey("SN_stop1"))
+			SN_stop1 = PlayerPrefs.GetString("SN_stop1");
+		else
+		{
+			PlayerPrefs.SetString("SN_stop1", "0");
+			SN_stop1 = "0";
+		}
+		
+		if(PlayerPrefs.HasKey("SN_stop2"))
+			SN_stop2 = PlayerPrefs.GetString("SN_stop2");
+		else
+		{
+			PlayerPrefs.SetString("SN_stop2", "0");
+			SN_stop2 = "0";
+		}
+		//获得设置界面显示值
 	}
 	
 	//设定界面下移
 	public void argu_down()
 	{
-		switch(ControlPanel_script.argu_setting)
+		switch(Main.argu_setting)
 		{
 		case 1:
-		ControlPanel_script.argu_setting = 2;
-			//Debug.Log("can run");
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 2;
+			ArguCursorPos();
+			break;
 		case 2:
-		ControlPanel_script.argu_setting = 3;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 3;
+			ArguCursorPos();
+			break;
 		case 3:
-		ControlPanel_script.argu_setting = 4;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 4;
+			ArguCursorPos();
+			break;
 		case 4:
-		ControlPanel_script.argu_setting = 5;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 5;
+			ArguCursorPos();
+			break;
 		case 5:
-		ControlPanel_script.argu_setting = 6;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 6;
+			ArguCursorPos();
+			break;
 		case 6:
-		ControlPanel_script.argu_setting = 7;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 7;
+			ArguCursorPos();
+			break;
 		case 7:
-		ControlPanel_script.argu_setting = 8;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 8;
+			ArguCursorPos();
+			break;
 		case 8:
-		ControlPanel_script.argu_setting = 9;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 9;
+			ArguCursorPos();
+			break;
 		}
 	}
 	
 		//设定界面上移
 	public void argu_up()
 	{
-		switch(ControlPanel_script.argu_setting)
+		switch(Main.argu_setting)
 		{
 		case 9:
-		ControlPanel_script.argu_setting = 8;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 8;
+			ArguCursorPos();
+			break;
 		case 8:
-		ControlPanel_script.argu_setting = 7;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 7;
+			ArguCursorPos();
+			break;
 		case 7:
-		ControlPanel_script.argu_setting = 6;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 6;
+			ArguCursorPos();
+			break;
 		case 6:
-		ControlPanel_script.argu_setting = 5;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 5;
+			ArguCursorPos();
+			break;
 		case 5:
-		ControlPanel_script.argu_setting = 4;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 4;
+			ArguCursorPos();
+			break;
 		case 4:
-		ControlPanel_script.argu_setting = 3;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 3;
+			ArguCursorPos();
+			break;
 		case 3:
-		ControlPanel_script.argu_setting = 2;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 2;
+			ArguCursorPos();
+			break;
 		case 2:
-		ControlPanel_script.argu_setting = 1;
-		ArguCursorPos();
-		break;
+			Main.argu_setting = 1;
+			ArguCursorPos();
+			break;
 		}
 	}
 	
 	//黄色背景位置
 	public void ArguCursorPos()
 	{
-		switch(ControlPanel_script.argu_setting)
+		switch(Main.argu_setting)
 		{
 		case 1:
-	    ControlPanel_script.argu_setting_cursor_y = 61.5f;
-		ControlPanel_script.argu_setting_cursor_w = 16f;
+		    Main.argu_setting_cursor_y = 61.5f;
+			Main.argu_setting_cursor_w = 16f;
 			break;
 		case 2:
-		ControlPanel_script.argu_setting_cursor_y = 92f;
-		ControlPanel_script.argu_setting_cursor_w = 16f;
+			Main.argu_setting_cursor_y = 86.5f;
+			Main.argu_setting_cursor_w = 16f;
 			break;
 		case 3:
-		ControlPanel_script.argu_setting_cursor_y = 121.5f;
-		ControlPanel_script.argu_setting_cursor_w = 16f;
+			Main.argu_setting_cursor_y = 112f;
+			Main.argu_setting_cursor_w = 16f;
 			break;
 		case 4:
-		ControlPanel_script.argu_setting_cursor_y = 152f;
-		ControlPanel_script.argu_setting_cursor_w = 16f;
+			Main.argu_setting_cursor_y = 136.5f;
+			Main.argu_setting_cursor_w = 16f;
 			break;
 		case 5:
-		ControlPanel_script.argu_setting_cursor_y = 181.5f;
-		ControlPanel_script.argu_setting_cursor_w = 36f;
+			Main.argu_setting_cursor_y = 161.5f;
+			Main.argu_setting_cursor_w = 36f;
 			break;
 		case 6:
-		ControlPanel_script.argu_setting_cursor_y = 212f;
-		ControlPanel_script.argu_setting_cursor_w = 16f;
+			Main.argu_setting_cursor_y = 186.5f;
+			Main.argu_setting_cursor_w = 16f;
 			break;
 		case 7:
-		ControlPanel_script.argu_setting_cursor_y = 241.5f;
-		ControlPanel_script.argu_setting_cursor_w = 16f;
+			Main.argu_setting_cursor_y = 212f;
+			Main.argu_setting_cursor_w = 16f;
 			break;
 		case 8:
-		ControlPanel_script.argu_setting_cursor_y = 272f;
-		ControlPanel_script.argu_setting_cursor_w = 117f;
+			Main.argu_setting_cursor_y = 236.5f;
+			Main.argu_setting_cursor_w = 116f;
 			break;
 		case 9:
-		ControlPanel_script.argu_setting_cursor_y = 301.5f;
-		ControlPanel_script.argu_setting_cursor_w = 117f;
+			Main.argu_setting_cursor_y = 261.5f;
+			Main.argu_setting_cursor_w = 116f;
 			break;
 		}
 	}
@@ -184,117 +247,117 @@ public class CooSystem : MonoBehaviour {
 	public void set_parameter(string input)
 	{
 		//Debug.Log(input);
-		switch (ControlPanel_script.argu_setting)
+		switch (Main.argu_setting)
 		{
 		case 1:
 			if( input == "0" || input=="1")
 			{
-			PlayerPrefs.SetString("parameter", input);
-		    parameter = PlayerPrefs.GetString("parameter");
-			//Debug.Log(parameter);
+				PlayerPrefs.SetString("parameter_writabel", input);
+			    parameter_writabel = input;
+				//Debug.Log(parameter);
 			}
 			else
-			{
 				Debug.Log("请输入0或1");
-				return;
-			}
 			break;
 		case 2:
 		    if( input == "0" || input=="1")
 			{
-			PlayerPrefs.SetString("TV", input);
-			TV = PlayerPrefs.GetString("TV");
-			//Debug.Log(TV);
+				PlayerPrefs.SetString("TV_check", input);
+				TV_check = input;
 			}
 			else
-			{
 				Debug.Log("请输入0或1");
-				return;
-			}
 			break;
 		case 3:
 			if( input == "0" || input=="1")
 			{
-			PlayerPrefs.SetString("CKJC", input);
-			CKJC = PlayerPrefs.GetString("CKJC");
-			//Debug.Log(CKJC);
+				PlayerPrefs.SetString("hole_code", input);
+				hole_code = input;
 			}
 			else
-			{
 				Debug.Log("请输入0或1");
-				return;
-			}
 			break;
 		case 4:
 			if( input == "0" || input=="1")
 			{
-			PlayerPrefs.SetString("input_unit", input);
-			input_unit = PlayerPrefs.GetString("input_unit");
-			//Debug.Log(input_unit);
+				PlayerPrefs.SetString("input_unit", input);
+				input_unit = input;
 			}
 			else
-			{
 				Debug.Log("请输入0或1");
-				return;
-			}
 			break;
 		case 5:
-			if( input == "0" || input=="1" || input=="2" || input=="3"|| input=="4"|| input=="5"|| input=="6"|| input=="7"|| input=="8"|| input=="9"
-				|| input=="10"|| input=="11"|| input=="12"|| input=="13"|| input=="14"|| input=="15"|| input=="16"|| input=="17"|| input=="18"|| input=="19"
-				|| input=="20"|| input=="21"|| input=="22"|| input=="23"|| input=="24"|| input=="25"|| input=="26"|| input=="27"|| input=="28"|| input=="29"
-				|| input=="30"|| input=="31"|| input=="32"|| input=="33"|| input=="34"|| input=="35")
-			{
-			PlayerPrefs.SetString("IO", input);
-			IO = PlayerPrefs.GetString("IO");
-			//Debug.Log(IO);
-			}
+			if(input.Length > 2)
+				Debug.Log("请输入0~35");
 			else
 			{
-				Debug.Log("请输入0~35");
-				return;
+				if(input.Length == 2)
+				{
+					Regex num_Reg = new Regex(@"\d{2}");
+					if(num_Reg.IsMatch(input))
+					{
+						int temp_value = Convert.ToInt32(input);
+						if(temp_value > 35)
+							Debug.Log("请输入0~35");
+						else
+						{
+							PlayerPrefs.SetString("IO", input);
+							IO = input;	
+						}	
+					}
+					else
+						Debug.Log("请输入0~35");
+				}
+				else
+				{
+					
+					Regex num_Reg = new Regex(@"\d{1}");
+					if(num_Reg.IsMatch(input))
+					{
+						int temp_value = Convert.ToInt32(input);
+						if(temp_value > 35)
+							Debug.Log("请输入0~35");
+						else
+						{
+							PlayerPrefs.SetString("IO", input);
+							IO = input;	
+						}	
+					}
+					else
+						Debug.Log("请输入0~35");
+				}
 			}
 			break;
 		case 6:
 			if( input == "0" || input=="1")
 			{
-			PlayerPrefs.SetString("order", input);
-			order= PlayerPrefs.GetString("order");
-			//Debug.Log(order);
+				PlayerPrefs.SetString("sequence_number", input);
+				sequence_number= input;
 			}
 			else
-			{
 				Debug.Log("请输入0或1");
-				return;
-			}
 			break;
 		case 7:
 			if( input == "0" || input=="1")
 			{
-			PlayerPrefs.SetString("zhidai", input);
-			zhidai = PlayerPrefs.GetString("zhidai");
-			//Debug.Log(zhidai);
+				PlayerPrefs.SetString("paper_tape", input);
+				paper_tape = input;
 			}
 			else
-			{
 				Debug.Log("请输入0或1");
-				return;
-			}
 			break;
 		case 8:
-			PlayerPrefs.SetString("order_stop1", input);
-			order_stop1 = PlayerPrefs.GetString("order_stop1");
-			//Debug.Log(order_stop1);
+			PlayerPrefs.SetString("SN_stop1", input);
+			SN_stop1 = input;
 			break;
 		case 9:
-			PlayerPrefs.SetString("order_stop2", input);
-			order_stop2 = PlayerPrefs.GetString("order_stop2");
-			//Debug.Log(order_stop2);
+			PlayerPrefs.SetString("SN_stop2", input);
+			SN_stop2 = input;
 			break;
 		default:
 			Debug.Log("out of range");
 			break;
-		}
-		
+		}	
 	}
 	
 	//参数界面内容
@@ -472,86 +535,86 @@ public class CooSystem : MonoBehaviour {
 
 	public void Down () 
 	{
-		switch (ControlPanel_script.coo_setting_1)
+		switch (Main.coo_setting_1)
 		{
 		case 1:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 1;
-				ControlPanel_script.coo_setting_1 = 2;
+				Main.coo_setting_2 = 1;
+				Main.coo_setting_1 = 2;
 			}
 			CooCursorPos();
 			break;
 		case 2:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 1;
-				ControlPanel_script.coo_setting_1 = 3;
+				Main.coo_setting_2 = 1;
+				Main.coo_setting_1 = 3;
 			}
 			CooCursorPos();
 			break;
 		case 3:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 1;
-				ControlPanel_script.coo_setting_1 = 4;
+				Main.coo_setting_2 = 1;
+				Main.coo_setting_1 = 4;
 			}
 			CooCursorPos();
 			break;
 		case 4:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 1;
-				ControlPanel_script.coo_setting_1 = 5;
-				ControlPanel_script.OffCooFirstPage = false;
+				Main.coo_setting_2 = 1;
+				Main.coo_setting_1 = 5;
+				Main.OffCooFirstPage = false;
 			}
 			CooCursorPos();
 			break;
 		case 5:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 1;
-				ControlPanel_script.coo_setting_1 = 6;
+				Main.coo_setting_2 = 1;
+				Main.coo_setting_1 = 6;
 			}
 			CooCursorPos();
 			break;
 		case 6:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 1;
-				ControlPanel_script.coo_setting_1 = 7;
+				Main.coo_setting_2 = 1;
+				Main.coo_setting_1 = 7;
 			}
 			CooCursorPos();
 			break;
 		case 7:
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_2 = 2;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 3;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_2 = 2;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 3;
 			CooCursorPos();
 			break;
 		}
@@ -559,85 +622,85 @@ public class CooSystem : MonoBehaviour {
 	
 	public void Up () 
 	{
-		switch (ControlPanel_script.coo_setting_1)
+		switch (Main.coo_setting_1)
 		{
 		case 1:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			CooCursorPos();
 			break;
 		case 2:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 3;
-				ControlPanel_script.coo_setting_1 = 1;
+				Main.coo_setting_2 = 3;
+				Main.coo_setting_1 = 1;
 			}
 			CooCursorPos();
 			break;
 		case 3:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 3;
-				ControlPanel_script.coo_setting_1 = 2;
+				Main.coo_setting_2 = 3;
+				Main.coo_setting_1 = 2;
 			}
 			CooCursorPos();
 			break;
 		case 4:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 3;
-				ControlPanel_script.coo_setting_1 = 3;
+				Main.coo_setting_2 = 3;
+				Main.coo_setting_1 = 3;
 			}
 			CooCursorPos();
 			break;
 		case 5:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 3;
-				ControlPanel_script.coo_setting_1 = 4;
-				ControlPanel_script.OffCooFirstPage = true;
+				Main.coo_setting_2 = 3;
+				Main.coo_setting_1 = 4;
+				Main.OffCooFirstPage = true;
 			}
 			CooCursorPos();
 			break;
 		case 6:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 3;
-				ControlPanel_script.coo_setting_1 = 5;
+				Main.coo_setting_2 = 3;
+				Main.coo_setting_1 = 5;
 			}
 			CooCursorPos();
 			break;
 		case 7:
-			if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_2 = 1;
-			else if(ControlPanel_script.coo_setting_2 == 3)
-				ControlPanel_script.coo_setting_2 = 2;
+			if(Main.coo_setting_2 == 2)
+				Main.coo_setting_2 = 1;
+			else if(Main.coo_setting_2 == 3)
+				Main.coo_setting_2 = 2;
 			else
 			{
-				ControlPanel_script.coo_setting_2 = 3;
-				ControlPanel_script.coo_setting_1 = 6;
+				Main.coo_setting_2 = 3;
+				Main.coo_setting_1 = 6;
 			}
 			CooCursorPos();
 			break;
@@ -646,18 +709,18 @@ public class CooSystem : MonoBehaviour {
 	
 	public void Left () 
 	{
-		switch(ControlPanel_script.coo_setting_1)
+		switch(Main.coo_setting_1)
 		{
 		case 3:
-			ControlPanel_script.coo_setting_1 = 1;
+			Main.coo_setting_1 = 1;
 			CooCursorPos();
 			break;
 		case 4:
-			ControlPanel_script.coo_setting_1 = 2;
+			Main.coo_setting_1 = 2;
 			CooCursorPos();
 			break;
 		case 7:
-			ControlPanel_script.coo_setting_1 = 5;
+			Main.coo_setting_1 = 5;
 			CooCursorPos();
 			break;
 		}
@@ -665,18 +728,18 @@ public class CooSystem : MonoBehaviour {
 	
 	public void Right () 
 	{
-		switch(ControlPanel_script.coo_setting_1)
+		switch(Main.coo_setting_1)
 		{
 		case 1:
-			ControlPanel_script.coo_setting_1 = 3;
+			Main.coo_setting_1 = 3;
 			CooCursorPos();
 			break;
 		case 2:
-			ControlPanel_script.coo_setting_1 = 4;
+			Main.coo_setting_1 = 4;
 			CooCursorPos();
 			break;
 		case 5:
-			ControlPanel_script.coo_setting_1 = 7;
+			Main.coo_setting_1 = 7;
 			CooCursorPos();
 			break;
 		}
@@ -684,36 +747,36 @@ public class CooSystem : MonoBehaviour {
 	
 	public void PageUp ()
 	{
-		switch (ControlPanel_script.coo_setting_1)
+		switch (Main.coo_setting_1)
 		{
 		case 5:
-			ControlPanel_script.coo_setting_1 = 1;
+			Main.coo_setting_1 = 1;
 			break;
 		case 6:
-			ControlPanel_script.coo_setting_1 = 2;
+			Main.coo_setting_1 = 2;
 			break;
 		case 7:
-			ControlPanel_script.coo_setting_1 = 3;
+			Main.coo_setting_1 = 3;
 			break;
 		}
 	}
 	
 	public void PageDown ()
 	{
-		switch (ControlPanel_script.coo_setting_1)
+		switch (Main.coo_setting_1)
 		{
 		case 1:
-			ControlPanel_script.coo_setting_1 = 5;
+			Main.coo_setting_1 = 5;
 			break;
 		case 2:
-			ControlPanel_script.coo_setting_1 = 6;
+			Main.coo_setting_1 = 6;
 			break;
 		case 3:
-			ControlPanel_script.coo_setting_1 = 7;
+			Main.coo_setting_1 = 7;
 			break;
 		case 4:
-			ControlPanel_script.coo_setting_1 = 7;
-			ControlPanel_script.coo_setting_2 = 3;
+			Main.coo_setting_1 = 7;
+			Main.coo_setting_2 = 3;
 			CooCursorPos();
 			break;
 		}
@@ -721,46 +784,46 @@ public class CooSystem : MonoBehaviour {
 	
 	public void CooCursorPos () 
 	{
-		switch(ControlPanel_script.coo_setting_1)
+		switch(Main.coo_setting_1)
 		{
 		case 1:
 		case 5:
-			ControlPanel_script.coo_setting_cursor_x = 131f;
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_cursor_y = 120f;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_cursor_y = 150f;
+			Main.coo_setting_cursor_x = 131f;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_cursor_y = 120f;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_cursor_y = 150f;
 			else
-				ControlPanel_script.coo_setting_cursor_y = 180f;
+				Main.coo_setting_cursor_y = 180f;
 			break;
 		case 2:
 		case 6:
-			ControlPanel_script.coo_setting_cursor_x = 131f;
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_cursor_y = 240f;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_cursor_y = 270f;
+			Main.coo_setting_cursor_x = 131f;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_cursor_y = 240f;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_cursor_y = 270f;
 			else
-				ControlPanel_script.coo_setting_cursor_y = 300f;
+				Main.coo_setting_cursor_y = 300f;
 			break;
 		case 3:
 		case 7:
-			ControlPanel_script.coo_setting_cursor_x = 376f;
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_cursor_y = 120f;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_cursor_y = 150f;
+			Main.coo_setting_cursor_x = 376f;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_cursor_y = 120f;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_cursor_y = 150f;
 			else
-				ControlPanel_script.coo_setting_cursor_y = 180f;
+				Main.coo_setting_cursor_y = 180f;
 			break;
 		case 4:
-			ControlPanel_script.coo_setting_cursor_x = 376f;
-			if(ControlPanel_script.coo_setting_2 == 1)
-				ControlPanel_script.coo_setting_cursor_y = 240f;
-			else if(ControlPanel_script.coo_setting_2 == 2)
-				ControlPanel_script.coo_setting_cursor_y = 270f;
+			Main.coo_setting_cursor_x = 376f;
+			if(Main.coo_setting_2 == 1)
+				Main.coo_setting_cursor_y = 240f;
+			else if(Main.coo_setting_2 == 2)
+				Main.coo_setting_cursor_y = 270f;
 			else
-				ControlPanel_script.coo_setting_cursor_y = 300f;
+				Main.coo_setting_cursor_y = 300f;
 			break;
 		}
 	}
@@ -771,46 +834,46 @@ public class CooSystem : MonoBehaviour {
 		switch (str_temp)
 		{
 		case "":
-			ControlPanel_script.coo_setting_1 = 1;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 1;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			break;
 		case "1":
-			ControlPanel_script.coo_setting_1 = 2;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 2;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			break;
 		case "2":
-			ControlPanel_script.coo_setting_1 = 3;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 3;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			break;
 		case "3":
-			ControlPanel_script.coo_setting_1 = 4;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 4;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			break;
 		case "4":
-			ControlPanel_script.coo_setting_1 = 5;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 5;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = false;
+			Main.OffCooFirstPage = false;
 			break;
 		case "5":
-			ControlPanel_script.coo_setting_1 = 6;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 6;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = false;
+			Main.OffCooFirstPage = false;
 			break;
 		case "6":
-			ControlPanel_script.coo_setting_1 = 7;
-			ControlPanel_script.coo_setting_2 = 1;
+			Main.coo_setting_1 = 7;
+			Main.coo_setting_2 = 1;
 			CooCursorPos();
-			ControlPanel_script.OffCooFirstPage = false;
+			Main.OffCooFirstPage = false;
 			break;
 		default:
 			break;
@@ -861,17 +924,17 @@ public class CooSystem : MonoBehaviour {
 			case 'X':
 			case 'x':
 				Measure_choose(1, value_f, 1);
-				ControlPanel_script.coo_setting_2 = 1;
+				Main.coo_setting_2 = 1;
 				break;
 			case 'Y':
 			case 'y':
 				Measure_choose(2, value_f, 1);
-				ControlPanel_script.coo_setting_2 = 2;
+				Main.coo_setting_2 = 2;
 				break;
 			case 'Z':
 			case 'z':
 				Measure_choose(3, value_f, 1);
-				ControlPanel_script.coo_setting_2 = 3;
+				Main.coo_setting_2 = 3;
 				break;
 			default:
 				Debug.Log("Format Error!!!");
@@ -913,15 +976,15 @@ public class CooSystem : MonoBehaviour {
 		}
 		value_f = float.Parse(value_str);
 		if(plus_flag)
-			Measure_choose(ControlPanel_script.coo_setting_2, value_f, 2);
+			Measure_choose(Main.coo_setting_2, value_f, 2);
 		else
-			Measure_choose(ControlPanel_script.coo_setting_2, value_f, 3);
+			Measure_choose(Main.coo_setting_2, value_f, 3);
 	}
 	
 	void Measure_choose (int xyz_select, float value_f, int mode_flag) 
 	{
 		string write_str = "";
-		switch (ControlPanel_script.coo_setting_1)
+		switch (Main.coo_setting_1)
 		{
 		case 1:
 			if(xyz_select == 1)
@@ -957,7 +1020,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G00_pos.x+","+G00_pos.y+","+G00_pos.z;
 				WriteCooChoose(1,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			Workpiece_Change();
 			break;
 		case 2:
@@ -994,7 +1057,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G54_pos.x+","+G54_pos.y+","+G54_pos.z;
 				WriteCooChoose(2,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			Workpiece_Change();
 			break;
 		case 3:
@@ -1031,7 +1094,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G55_pos.x+","+G55_pos.y+","+G55_pos.z;
 				WriteCooChoose(3,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			Workpiece_Change();
 			break;
 		case 4:
@@ -1068,7 +1131,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G56_pos.x+","+G56_pos.y+","+G56_pos.z;
 				WriteCooChoose(4,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = true;
+			Main.OffCooFirstPage = true;
 			Workpiece_Change();
 			break;
 		case 5:
@@ -1105,7 +1168,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G57_pos.x+","+G57_pos.y+","+G57_pos.z;
 				WriteCooChoose(5,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = false;
+			Main.OffCooFirstPage = false;
 			Workpiece_Change();
 			break;
 		case 6:
@@ -1142,7 +1205,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G58_pos.x+","+G58_pos.y+","+G58_pos.z;
 				WriteCooChoose(6,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = false;
+			Main.OffCooFirstPage = false;
 			Workpiece_Change();
 			break;
 		case 7:
@@ -1179,7 +1242,7 @@ public class CooSystem : MonoBehaviour {
 				write_str = G59_pos.x+","+G59_pos.y+","+G59_pos.z;
 				WriteCooChoose(7,write_str);
 			}
-			ControlPanel_script.OffCooFirstPage = false;
+			Main.OffCooFirstPage = false;
 			Workpiece_Change();
 			break;
 		default:

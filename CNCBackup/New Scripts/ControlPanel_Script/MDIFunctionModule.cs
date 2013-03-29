@@ -190,10 +190,39 @@ public class MDIFunctionModule : MonoBehaviour {
 			Main.InputTextSize = Main.sty_InputTextField.CalcSize(new GUIContent(Main.CursorText.text));
 			Main.ProgEDITCusorPos = 57f + Main.InputTextSize.x;
 		}
-		Main.PosMenu = false;
-		Main.SettingMenu = true;
-		Main.ProgMenu = false;
-		//CooSystem_script.ReadCooFile();
+		if(Main.SettingMenu == false)
+		{
+			Main.PosMenu = false;
+			Main.SettingMenu = true;
+			Main.ProgMenu = false;
+		}
+		else
+		{
+			if(Main.OffSetTool)
+			{
+				Main.OffSetTool = false;
+				Main.OffSetSetting = true;
+				Main.OffSetCoo = false;
+				Main.OffSetOne = true;
+				Main.OffSetTwo = false;
+			}
+			else if(Main.OffSetSetting)
+			{
+				Main.OffSetTool = false;
+				Main.OffSetSetting = false;
+				Main.OffSetCoo = true;
+				Main.OffSetOne = true;
+				Main.OffSetTwo = false;
+			}
+			else
+			{
+				Main.OffSetTool = true;
+				Main.OffSetSetting = false;
+				Main.OffSetCoo = false;
+				Main.OffSetOne = true;
+				Main.OffSetTwo = false;
+			}
+		}	
 	}
 	
 	// Update is called once per frame

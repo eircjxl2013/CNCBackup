@@ -2318,6 +2318,12 @@ public class MDIEditModule : MonoBehaviour {
 			{
 				
 			}
+			//设定界面下移
+			if(Main.OffSetSetting)
+			{
+				CooSystem_script.argu_down();
+			}
+
 			if(Main.OffSetCoo)
 			{
 				CooSystem_script.Down();
