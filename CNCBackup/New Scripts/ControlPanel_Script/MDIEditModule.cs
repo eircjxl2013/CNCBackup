@@ -139,9 +139,10 @@ public class MDIEditModule : MonoBehaviour {
 				
 				if(Main.SettingMenu)
 				{
+					//刀偏界面左移
 					if(Main.OffSetTool)
 					{
-						
+						CooSystem_script.tool_left();
 					}
 					if(Main.OffSetCoo)
 					{
@@ -181,9 +182,10 @@ public class MDIEditModule : MonoBehaviour {
 				
 				if(Main.SettingMenu)
 				{
+					//刀偏界面右移
 					if(Main.OffSetTool)
 					{
-					
+					CooSystem_script.tool_right();
 					}
 					if(Main.OffSetCoo)
 					{
@@ -1757,9 +1759,11 @@ public class MDIEditModule : MonoBehaviour {
 		
 		if(Main.SettingMenu)
 		{
+			//刀偏向上翻页
 			if(Main.OffSetTool)
 			{
-				
+				if(Main.ToolOffSetPage_num>0)
+					CooSystem_script.Tool_pageup();
 			}
 			if(Main.OffSetCoo)
 			{
@@ -1855,7 +1859,9 @@ public class MDIEditModule : MonoBehaviour {
 		{
 			if(Main.OffSetTool)
 			{
-				
+				//刀偏向下翻页
+				if(Main.ToolOffSetPage_num < 49)
+					CooSystem_script.Tool_pagedown();
 			}
 			if(Main.OffSetCoo)
 			{
@@ -2257,9 +2263,10 @@ public class MDIEditModule : MonoBehaviour {
 		
 		if(Main.SettingMenu)
 		{
+			//刀偏界面上移
 			if(Main.OffSetTool)
 			{
-				
+				CooSystem_script.tool_up();
 			}
 			//设定界面上移
 			if(Main.OffSetSetting)
@@ -2314,9 +2321,10 @@ public class MDIEditModule : MonoBehaviour {
 		
 		if(Main.SettingMenu)
 		{
+			//刀偏界面下移
 			if(Main.OffSetTool)
 			{
-				
+				CooSystem_script.tool_down();
 			}
 			//设定界面下移
 			if(Main.OffSetSetting)

@@ -291,13 +291,13 @@ public class ControlPanel : MonoBehaviour {
 	Rect power_notifi_window = new Rect(Screen.width / 2f, Screen.height / 2f, 200f, 100f); 
 	public float move_rate = 1f;
 	
-	//设定界面修改---陈振华---03.11
+	//设定界面修改---张振华---03.11
 	public GUIStyle sty_OffSet_Coo_mini;
 	public GUIStyle sty_OffSet_Coo_mid;
 	public float argu_setting_cursor_y = 61.5f;
 	public float argu_setting_cursor_w = 16f;
 	public int argu_setting = 1;
-	//设定界面修改---陈振华---03.11
+	//设定界面修改---张振华---03.11
 	
 	//位置界面功能完善---宋荣 ---03.09
 	public bool operationBottomScrInitial=false;//position模式下按下操作键的初始界面显示标志
@@ -316,6 +316,17 @@ public class ControlPanel : MonoBehaviour {
 	public bool ProgEDITAt=false;
 	public int at_position = -1;
 	public int at_page_number = -1;
+	
+	//刀偏界面完善---张振华---03.30
+	public GUIStyle sty_MostWords_ToolOffSet;        //刀偏界面字体
+	public List<bool> ToolOffSetPage = new List<bool>();
+	public int ToolOffSetPage_num = 0;
+	public int number = 0;
+	public int tool_setting = 1 ;
+	public float tool_setting_cursor_y = 81.5f;
+	public float tool_setting_cursor_w = 91.5f;
+	//刀偏界面完善---张振华---03.30
+
 	#endregion
 	
 	void Awake () 
@@ -751,6 +762,16 @@ public class ControlPanel : MonoBehaviour {
 		OffSetTool = true;
 		OffSetSetting = false;
 		OffSetCoo = false;
+		
+		//刀偏界面完善---张振华---03.30
+		sty_MostWords_ToolOffSet.font = (Font)Resources.Load("font/simfang");
+		sty_MostWords_ToolOffSet.fontSize = 13;
+		ToolOffSetPage_num = 0;    //页面数
+		number = 0;                            //序号
+		tool_setting = 1;                     //黄色背景序号
+	    tool_setting_cursor_y = 81.5f;
+	    tool_setting_cursor_w = 91.5f;
+		//刀偏界面完善---张振华---03.30
 	}
 	
 	void OnGUI()
@@ -1651,6 +1672,68 @@ public class ControlPanel : MonoBehaviour {
 		else if(StrValue.Length == 2)
 			DisplayStr = StrValue;
 		return DisplayStr;	
+	}
+	
+	//刀偏界面加入---陈振华---03.30
+	//格式化显示数字,刀偏界面
+	public string ToolStringGet (float StrValue) 
+	{
+		int intNum = 0;	
+		string DisplayStr = "";
+		intNum = (int)StrValue;
+		
+		if(intNum < 0)
+		{
+			if(intNum > -100 && intNum <= -10)
+				DisplayStr = "  " + intNum + ".";
+			else if(intNum > -10)
+				DisplayStr = "   " + intNum + ".";
+			else if(intNum <= -100 && intNum > -1000)
+				DisplayStr = " "+intNum + ".";
+			else
+				DisplayStr = ""+intNum + ".";
+		}
+		else if(intNum == 0)
+		{
+			if(StrValue < 0)
+				DisplayStr = "   -0.";
+			else		
+			    DisplayStr = "    0" + ".";
+		}
+		else
+		{
+			if(intNum < 100 && intNum >= 10)
+				DisplayStr = "   " + intNum + ".";
+			else if(intNum < 10)
+				DisplayStr = "    " + intNum + ".";
+			else if(intNum < 1000 && intNum >= 100)	
+				DisplayStr = "  " + intNum + ".";
+			else	
+				DisplayStr = " " + intNum + ".";
+		}
+		
+		intNum = (int)(Math.Abs(StrValue*10) % 10);
+		DisplayStr += intNum;
+		intNum = (int)(Math.Abs(StrValue*100) % 10);
+		DisplayStr += intNum;
+		intNum = (int)(Math.Abs(StrValue*1000) % 10);
+		DisplayStr += intNum;
+		return DisplayStr;	
+	}
+	
+	//刀偏界面加入---陈振华---03.30
+	//使刀偏界面的序号为3位
+	public string Tool_numberGet(int StrValue)
+	{
+		 string StringValue = StrValue.ToString();
+		 string DisplayStr = "";
+		 if(StringValue.Length == 1)
+			DisplayStr = "00"+StringValue;
+		 if(StringValue.Length == 2)
+			DisplayStr = "0"+StringValue;
+		 if(StringValue.Length == 3)
+			DisplayStr = StringValue;
+		  return DisplayStr;
 	}
 
 	string SingleCodeFormat (string OriCode) 

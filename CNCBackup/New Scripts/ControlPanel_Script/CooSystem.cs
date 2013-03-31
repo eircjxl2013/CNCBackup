@@ -33,6 +33,14 @@ public class CooSystem : MonoBehaviour {
 	public string SN_stop2 = "0";
 	//设定界面修改---陈振华---03.11
 	
+	//刀偏界面加入---陈振华---03.30
+	public float [] shape_H = new float[400];  //形状H
+	public float [] wear_H  = new float[400];  //磨损H
+	public float [] shape_D = new float[400];  //形状D
+	public float [] wear_D  = new float[400];  //磨损D	
+	public float [] write_tool_str = new float[400];
+	//刀偏界面加入---陈振华---03.30
+	
 	void Awake () {
 		
 	}
@@ -118,6 +126,822 @@ public class CooSystem : MonoBehaviour {
 			SN_stop2 = "0";
 		}
 		//获得设置界面显示值
+		
+		ReadToolFile ();
+	}
+	
+	//刀偏界面下移
+	public void tool_down()
+	{
+		if(Main.tool_setting>=1&&Main.tool_setting<=28)
+	   Main.tool_setting  = Main.tool_setting + 4;
+		else if(Main.tool_setting == 29)
+		{
+			if(Main.ToolOffSetPage_num < 49)
+			Tool_pagedown();
+		Main.tool_setting = 1;
+		}
+		else if(Main.tool_setting == 30)
+		{
+			if(Main.ToolOffSetPage_num < 49)
+			Tool_pagedown();
+		Main.tool_setting = 2;
+		}
+		else if(Main.tool_setting == 31)
+		{
+			if(Main.ToolOffSetPage_num < 49)
+			Tool_pagedown();
+		Main.tool_setting = 3;
+		}
+		else if(Main.tool_setting == 32)
+		{
+			if(Main.ToolOffSetPage_num < 49)
+			Tool_pagedown();
+		Main.tool_setting = 4;
+		}
+		//Debug.Log(Main.tool_setting);
+		ToolCursorPos();
+		
+	}
+	
+	//刀偏界面上移
+	public void tool_up()
+	{
+		if(Main.tool_setting>=5&&Main.tool_setting<=32)
+	   Main.tool_setting  = Main.tool_setting - 4;
+		else if(Main.tool_setting == 1)
+		{
+			if(Main.ToolOffSetPage_num > 0)
+			Tool_pageup();
+		Main.tool_setting = 29;
+		}
+	    else if(Main.tool_setting == 2)
+		{
+			if(Main.ToolOffSetPage_num > 0)
+			Tool_pageup();
+		Main.tool_setting = 30;
+		}
+		else if(Main.tool_setting == 3)
+		{
+			if(Main.ToolOffSetPage_num > 0)
+			Tool_pageup();
+		Main.tool_setting = 31;
+		}
+		else if(Main.tool_setting == 4)
+		{
+			if(Main.ToolOffSetPage_num > 0)
+			Tool_pageup();
+		Main.tool_setting = 32;
+		}
+		//Debug.Log(Main.tool_setting);
+		ToolCursorPos();
+	}
+	
+	//刀偏界面右移
+	public void tool_right()
+	{
+		if(Main.tool_setting >= 1 && Main.tool_setting <=32)
+		{
+		if(Main.tool_setting % 4 == 1 || Main.tool_setting % 4 == 2|| Main.tool_setting % 4 == 3)
+			Main.tool_setting  = Main.tool_setting + 1;
+		}
+		ToolCursorPos();
+		//Debug.Log(Main.tool_setting );
+	}
+	//刀偏界面左移
+	public void tool_left()
+	{
+		if(Main.tool_setting >= 1 && Main.tool_setting <=32)
+		{
+		if(Main.tool_setting % 4 == 0 || Main.tool_setting % 4 == 2|| Main.tool_setting % 4 == 3)
+			Main.tool_setting  = Main.tool_setting - 1;
+		}
+		//Debug.Log(Main.tool_setting );
+		ToolCursorPos();
+	}
+	
+	//刀偏页面下翻
+	public void Tool_pagedown()
+	{
+		Main.ToolOffSetPage_num = Main.ToolOffSetPage_num + 1;		
+	}
+	
+	//刀偏页面上翻
+	public void Tool_pageup()
+	{
+		Main.ToolOffSetPage_num = Main.ToolOffSetPage_num - 1;
+	}
+	
+	//黄色背景图片
+	public void ToolCursorPos()
+	{
+		if(Main.tool_setting>= 1 && Main.tool_setting <= 32)
+		{
+			if(Main.tool_setting % 4 == 1)
+			{
+				Main.tool_setting_cursor_w = 91.5f;
+			}
+			else if (Main.tool_setting % 4 == 2)
+			{
+				Main.tool_setting_cursor_w = 201.5f;
+			}
+			else if (Main.tool_setting % 4 == 3)
+			{
+				Main.tool_setting_cursor_w = 311.5f;
+			}
+			else if (Main.tool_setting % 4 == 0)
+			{
+				Main.tool_setting_cursor_w = 421.5f;
+			}
+			
+			if((int)(Main.tool_setting / 4.1f) == 0)
+				Main.tool_setting_cursor_y = 81.5f;	
+			else if((int)(Main.tool_setting / 4.1f) == 1)
+				Main.tool_setting_cursor_y = 106.5f;
+			else if((int)(Main.tool_setting / 4.1f) == 2)
+				Main.tool_setting_cursor_y = 132.5f;
+			else if((int)(Main.tool_setting / 4.1f) == 3)
+				Main.tool_setting_cursor_y = 156.5f;
+			else if((int)(Main.tool_setting / 4.1f) == 4)
+				Main.tool_setting_cursor_y =181.5f;
+			else if((int)(Main.tool_setting / 4.1f )== 5)
+				Main.tool_setting_cursor_y = 206.5f;
+			else if((int)(Main.tool_setting / 4.1f) == 6)
+				Main.tool_setting_cursor_y = 232.5f;
+			else if((int)(Main.tool_setting / 4.1f) == 7)
+				Main.tool_setting_cursor_y = 256.5f;
+		}
+		//Debug.Log((int)Main.tool_setting / 4.1f);
+	}
+	
+	public void SearchToolNo(string num_str)
+	{
+		string str_temp = num_str.TrimStart('0', ' ');
+		int num = int.Parse(str_temp);
+		if(num > 400 || num <= 0)
+		{
+			Debug.Log("请输入1~400");
+			return;
+		}
+		if((num-1) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-1) / 8);
+			Main.tool_setting = 1;	
+			ToolCursorPos();
+		}
+		else if((num-2) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-2) / 8);
+			Main.tool_setting = 5;	
+			ToolCursorPos();
+		}
+		else if((num-3) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-3) / 8);
+			Main.tool_setting = 9;	
+			ToolCursorPos();
+		}
+		else if((num-4) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-4) / 8);
+			Main.tool_setting = 13;	
+			ToolCursorPos();
+		}
+		else if((num-5) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-5) / 8);
+			Main.tool_setting = 17;	
+			ToolCursorPos();
+		}
+		else if((num-6) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-6) / 8);
+			Main.tool_setting = 21;	
+			ToolCursorPos();
+		}
+		else if((num-7) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-7) / 8);
+			Main.tool_setting = 25;	
+			ToolCursorPos();
+		}
+		else if((num-8) % 8 == 0)
+		{
+			Main.ToolOffSetPage_num = ((num-8) / 8);
+			Main.tool_setting = 29;	
+			ToolCursorPos();
+		}
+	}
+	
+	//刀偏界面初始数据读取
+	public void ReadToolFile () 
+	{
+		string line_str = "";
+		string tool_str ="";
+		StreamReader line_str_reader;
+		FileStream tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/shape_H.txt", FileMode.OpenOrCreate, FileAccess.Read);
+		line_str_reader = new StreamReader(tool_stream);
+		line_str = line_str_reader.ReadLine();
+		//Debug.Log(line_str);
+		if(line_str == null)
+		{
+			for(int i = 0; i<400; i++)
+				shape_H[i] = 0f;
+			
+		}
+		else
+		{
+			for(int i = 0; i<400; i++)
+			{
+			    tool_str = line_str;
+       			shape_H[i] = float.Parse(tool_str);
+				line_str = line_str_reader.ReadLine();
+			}
+		}
+		line_str_reader.Close();
+		tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/wear_H.txt", FileMode.OpenOrCreate, FileAccess.Read);
+		line_str_reader = new StreamReader(tool_stream);
+		line_str = line_str_reader.ReadLine();
+		if(line_str == null)
+		{
+			for(int i = 0;i<400;i++)
+			wear_H[i] = 0f;	
+		}
+		else
+		{
+			for(int i = 0;i<400;i++)
+			{
+				tool_str = line_str;
+				wear_H[i] = float.Parse(tool_str);
+				line_str = line_str_reader.ReadLine();
+			}
+		}
+		line_str_reader.Close();
+		tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/shape_D.txt", FileMode.OpenOrCreate, FileAccess.Read);
+		line_str_reader = new StreamReader(tool_stream);
+		line_str = line_str_reader.ReadLine();
+		if(line_str == null)
+		{
+			for(int i = 0;i<400;i++)
+			shape_D[i] = 0f;	
+		}
+		else
+		{
+			for(int i = 0;i<400;i++)
+			{
+				tool_str = line_str;
+				shape_D[i] =  float.Parse(tool_str);
+				line_str = line_str_reader.ReadLine();
+			}
+		}
+		line_str_reader.Close();
+		tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/wear_D.txt", FileMode.OpenOrCreate, FileAccess.Read);
+		line_str_reader = new StreamReader(tool_stream);
+		line_str = line_str_reader.ReadLine();
+		if(line_str == null)
+		{
+			for(int i = 0;i<400;i++)
+			wear_D[i] = 0f;
+			
+		}
+		else
+		{
+			for(int i = 0;i<400;i++)
+			{
+				tool_str = line_str;
+				wear_D[i] =  float.Parse(tool_str);
+				line_str = line_str_reader.ReadLine();
+			}
+		}
+		line_str_reader.Close();
+	}
+	
+	//刀偏写入文件名称选择
+	public void WriteToolChoose (int tool_select ) 
+	{
+		switch (tool_select)
+		{
+		case 1:
+			WriteToolFile("shape_H");
+			break;
+		case 2:
+			WriteToolFile("wear_H");
+			break;
+		case 3:
+			WriteToolFile("shape_D");
+			break;
+		case 4:
+			WriteToolFile("wear_D");
+			break;
+		default:
+			Debug.Log("out of range");
+			break;
+		}
+	}
+	
+	//刀偏写入功能
+	void WriteToolFile (string filename)
+	{
+		StreamWriter line_str_writer;
+		FileStream tool_stream;
+		FileInfo check_exist = new FileInfo(Application.dataPath+"/Resources/tool_parameter/"+filename+".txt");
+		if(check_exist.Exists)
+			tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/"+filename+".txt", FileMode.Truncate, FileAccess.Write);	
+		else
+			tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/"+filename+".txt", FileMode.Create, FileAccess.Write);
+		line_str_writer = new StreamWriter(tool_stream);
+		for(int i=0;i<400;i++)
+		{
+		line_str_writer.WriteLine(write_tool_str[i]);
+		}
+		line_str_writer.Close();
+	}
+	
+	//刀偏c输入功能
+	public void C_Input (string tool_value)
+	{
+		char[] tool_choose = tool_value.ToCharArray();
+		float value_f = 0;
+		if( tool_choose[0] == 'Z' || tool_choose[0] == 'z' )
+		{
+			if(Main.tool_setting == 1 || Main.tool_setting == 2|| Main.tool_setting == 5|| Main.tool_setting == 6|| Main.tool_setting == 9|| Main.tool_setting == 10|| Main.tool_setting == 13|| Main.tool_setting == 14|| Main.tool_setting == 17|| Main.tool_setting == 18|| Main.tool_setting == 21|| Main.tool_setting == 22|| Main.tool_setting == 25|| Main.tool_setting == 26|| Main.tool_setting == 29|| Main.tool_setting == 30)
+			{
+			value_f = relative_pos.z;
+			Write_choose( value_f, 1);
+			}
+			else if(Main.tool_setting == 3 || Main.tool_setting == 4|| Main.tool_setting == 7|| Main.tool_setting == 8|| Main.tool_setting == 11|| Main.tool_setting == 12|| Main.tool_setting == 15|| Main.tool_setting == 16|| Main.tool_setting == 19|| Main.tool_setting == 20|| Main.tool_setting == 23|| Main.tool_setting == 24|| Main.tool_setting == 27|| Main.tool_setting == 28|| Main.tool_setting == 31|| Main.tool_setting == 32)
+		    return;
+		}
+		else
+		{
+			Debug.Log("Format Error!!!");
+			return;
+		}	
+	}
+	
+	//刀偏+输入功能
+	public void Plus_Tool_Input (string input_value, bool plus_flag) 
+	{
+		char[] tool_choose = input_value.ToCharArray();
+		string value_str = "";
+		float value_f = 0;
+		for(int i = 0; i < tool_choose.Length; i++)
+		{
+			if(tool_choose[i] != '.'  && tool_choose[i] != '+' && tool_choose[i] != '-')
+			{
+				if(tool_choose[i] < '0' || tool_choose[i] > '9')
+				{
+					Debug.Log("Format Error!!!");
+					return;
+				}
+			}
+			else if(tool_choose[i] == '+' || tool_choose[i] == '-')
+			{
+				if(i != 0)
+				{
+					Debug.Log("Format Error!!!");
+					return;
+				}
+			}
+			value_str += tool_choose[i];
+		}
+		if(value_str == "+" || value_str == "-")
+		{
+			Debug.Log("Format Error!!!");
+			return;
+		}
+		value_f = float.Parse(value_str);
+		if(plus_flag)
+			Write_choose( value_f, 2);
+		else
+			Write_choose( value_f, 3);
+	}
+	
+	//刀偏输入框选择
+	void Write_choose (float value_f, int mode_flag) 
+	{
+		
+		switch(Main.tool_setting)
+		{
+		case 1:
+				if(mode_flag == 1)
+					shape_H[Main.number ] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number ] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number ] = value_f; 
+		        for(int i=0;i<400;i++)
+			     {
+				     write_tool_str[i] =  shape_H[i];
+				     WriteToolChoose(1);
+			     }
+			 break;
+		case 2:
+				if(mode_flag == 1)
+					wear_H[Main.number ] = value_f; 
+				else if(mode_flag == 2)
+					wear_H[Main.number ] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number ] = value_f; 
+			    for(int i=0;i<400;i++)	
+			    {
+	                write_tool_str[i] =  shape_H[i];			
+				    WriteToolChoose(2);
+			    }
+			break;
+		case 3:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number ] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number ] = value_f;   
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+				    WriteToolChoose(3);
+			    } 
+			break;
+		case 4:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number ] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number ] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			    } 
+			break;
+		case 5:
+			    if(mode_flag == 1)
+					shape_H[Main.number +1] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +1] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +1] = value_f; 
+			    for(int i=0;i<400;i++) 	
+			     {
+			       write_tool_str[i] =  shape_H[i];
+			       WriteToolChoose(1);
+			     }
+			break;
+		case 6:
+				if(mode_flag == 1)
+					wear_H[Main.number +1] = value_f; 
+				else if(mode_flag == 2)
+					wear_H[Main.number +1] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number +1] = value_f; 
+			    for(int i=0;i<400;i++) 	
+		    	{
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(2);
+			    }
+			break;
+		case 7:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +1] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +1] = value_f; 
+			    for(int i=0;i<400;i++)
+			     {
+				     write_tool_str[i] =  shape_H[i];
+					 WriteToolChoose(3);
+			     }
+			break;
+		case 8:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +1] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +1] = value_f; 
+			    for(int i=0;i<400;i++)
+			     {
+				     write_tool_str[i] =  shape_H[i];
+					 WriteToolChoose(4);
+			     }
+			break;
+		case 9:
+				if(mode_flag == 1)
+					shape_H[Main.number +2] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +2] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +2] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(1);
+			    }
+			break;
+		case 10:
+				if(mode_flag == 1)
+					wear_H[Main.number +2] = value_f;
+				else if(mode_flag == 2)
+					wear_H[Main.number +2] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number +2] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(2);
+			    }
+			break;
+		case 11:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +2] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +2] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(3);
+			    }
+			break;
+		case 12:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +2] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +2] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			    }
+			break;
+		case 13:
+				if(mode_flag == 1)
+					shape_H[Main.number +3] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +3] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +3] = value_f; 
+			     for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(1);
+			    }
+			break;
+		case 14:
+				if(mode_flag == 1)
+					wear_H[Main.number +3] = value_f;
+				else if(mode_flag == 2)
+					wear_H[Main.number +3] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number +3] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(2);
+			    }
+			break;
+		case 15:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +3] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +3] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(3);
+			    }
+			break;
+		case 16:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +3] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +3] = value_f; 
+			    for(int i=0;i<400;i++) 
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			    }
+			break;
+		case 17:
+				if(mode_flag == 1)
+					shape_H[Main.number +4] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +4] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +4] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(1);
+			    }
+			break;
+		case 18:
+				if(mode_flag == 1)
+					wear_H[Main.number +4] = value_f; 
+				else if(mode_flag == 2)
+					wear_H[Main.number +4] += value_f;
+				else if(mode_flag == 3)
+			 		wear_H[Main.number +4] = value_f; 
+			     for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(2);
+			    }
+			break;
+		case 19:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +4] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +4] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(3);
+			    }
+			break;
+		case 20:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +4] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +4] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			    }
+			break;
+		case 21:
+				if(mode_flag == 1)
+					shape_H[Main.number +5] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +5] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +5] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(1);
+			    }
+			break;
+		case 22:
+				if(mode_flag == 1)
+					wear_H[Main.number +5] = value_f; 
+				else if(mode_flag == 2)
+					wear_H[Main.number +5] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number +5] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(2);
+			    }
+			break;
+		case 23:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +5] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +5] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(3);
+			    }
+			break;
+		case 24:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +5] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +5] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			    }
+			break;
+		case 25:
+				if(mode_flag == 1)
+					shape_H[Main.number +6] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +6] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +6] = value_f; 
+			     for(int i=0;i<400;i++)
+			     {
+				     write_tool_str[i] =  shape_H[i];
+					 WriteToolChoose(1);
+			     }
+			break;
+		case 26:
+				if(mode_flag == 1)
+					wear_H[Main.number +6] = value_f; 
+				else if(mode_flag == 2)
+					wear_H[Main.number +6] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number +6] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+				    write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(2);
+			    }
+			break;
+		case 27:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +6] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +6] = value_f; 
+			     for(int i=0;i<400;i++)
+			     {
+			     	write_tool_str[i] =  shape_H[i];
+				 	WriteToolChoose(3);
+			     } 
+			break;
+		case 28:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +6] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +6] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+			    	write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			    }
+			break;
+		case 29:
+				if(mode_flag == 1)
+					shape_H[Main.number +7] = value_f; 
+				else if(mode_flag == 2)
+					shape_H[Main.number +7] += value_f;
+				else if(mode_flag == 3)
+					shape_H[Main.number +7] = value_f; 
+			     for(int i=0;i<400;i++)
+			     {
+			     	write_tool_str[i] =  shape_H[i];
+				 	WriteToolChoose(1);
+			     }
+			break;
+		case 30:
+				if(mode_flag == 1)
+					wear_H[Main.number +7] = value_f; 
+				else if(mode_flag == 2)
+					wear_H[Main.number +7] += value_f;
+				else if(mode_flag == 3)
+					wear_H[Main.number +7] = value_f; 
+			    for(int i=0;i<400;i++)
+			     {
+				     write_tool_str[i] =  shape_H[i];
+					 WriteToolChoose(2);
+			     }
+			break;
+		case 31:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					shape_D[Main.number +7] += value_f;
+				else if(mode_flag == 3)
+					shape_D[Main.number +7] = value_f; 
+			     for(int i=0;i<400;i++)
+			     { 
+				     write_tool_str[i] =  shape_H[i];
+					 WriteToolChoose(3);
+			     }
+			break;
+		case 32:
+				if(mode_flag == 1)	
+				    return;
+				else if(mode_flag == 2)
+					wear_D[Main.number +7] += value_f;
+				else if(mode_flag == 3)
+					wear_D[Main.number +7] = value_f; 
+			    for(int i=0;i<400;i++)
+			    {
+			    	write_tool_str[i] =  shape_H[i];
+					WriteToolChoose(4);
+			     }
+			break;
+		default:
+			break;
+		}	
 	}
 	
 	//设定界面下移
