@@ -4,10 +4,12 @@ using System.Collections;
 public class MDIFunctionModule : MonoBehaviour {
 	ControlPanel Main;
 	CooSystem CooSystem_script;
+	MDIInputModule MDIInput_script;
 	// Use this for initialization
 	void Start () {
 		Main = gameObject.GetComponent<ControlPanel>();
 		CooSystem_script = gameObject.GetComponent<CooSystem>();
+		MDIInput_script=gameObject.GetComponent<MDIInputModule>();
 	}
 	
 	public void Function () 
@@ -54,10 +56,10 @@ public class MDIFunctionModule : MonoBehaviour {
 				    {	
 			            if(Main.InputText != "")
 				        {	
-				        CooSystem_script.Plus_Tool_Input(Main.InputText, false);		
-				        Main.InputText = "";
-				        Main.CursorText.text = Main.InputText;
-				        Main.ProgEDITCusorPos = 57f;
+					        CooSystem_script.Plus_Tool_Input(Main.InputText, false);		
+					        Main.InputText = "";
+					        Main.CursorText.text = Main.InputText;
+					        Main.ProgEDITCusorPos = 57f;
 				        }
 				    }
 					if(Main.OffSetCoo && Main.OffSetTwo)

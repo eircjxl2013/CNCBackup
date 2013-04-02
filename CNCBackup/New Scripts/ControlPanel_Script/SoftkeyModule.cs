@@ -209,16 +209,6 @@ public class SoftkeyModule : MonoBehaviour {
 			//宋荣
 			if(Main.posOperationMode)
 			{
-				/*if(Main.statusBeforeOperation==1)
-				{
-					Pos_Script.preSetAbsoluteCoo=CooSystem_script.absolute_pos;
-					Debug.Log("预置成功");
-				}
-				if((Main.statusBeforeOperation==2||Main.statusBeforeOperation==3)&&(MDIInput_Script.isXSelected||MDIInput_Script.isYSelected||MDIInput_Script.isZSelected))
-				{
-					Pos_Script.preSetRelativeCoo=CooSystem_script.relative_pos;
-					Debug.Log("预置相对坐标成功");
-				}*/
 				if(Main.operationBottomScrInitial)
 			    {
 				   if(Main.statusBeforeOperation==1)
@@ -227,7 +217,6 @@ public class SoftkeyModule : MonoBehaviour {
 				        Main.operationBottomScrExecute=true;
 				        preSetSelected=true;
 					}
-				   
 				   if((Main.statusBeforeOperation==2||Main.statusBeforeOperation==3)&&(MDIInput_Script.isXSelected||MDIInput_Script.isYSelected||MDIInput_Script.isZSelected))
 				   {
 					    Pos_Script.preSetRelativeCoo=CooSystem_script.relative_pos;
@@ -550,9 +539,8 @@ public class SoftkeyModule : MonoBehaviour {
 				Main.RelativeCoo=false;
 				Main.AbsoluteCoo=false;
 				Main.GeneralCoo=false;
-				 Debug.Log("响应fifth");
+				Debug.Log("响应fifth");
 			}
-			
 			else if(Main.operationBottomScrInitial)
 			{
 				Main.operationBottomScrInitial=false;
@@ -561,7 +549,6 @@ public class SoftkeyModule : MonoBehaviour {
 				Debug.Log("runtimeIsBlink变为true");
 				Main.partsNumBlink=false;
 			}
-			
 		    else if(Main.operationBottomScrExecute)
 			{
 				Main.operationBottomScrInitial=true;

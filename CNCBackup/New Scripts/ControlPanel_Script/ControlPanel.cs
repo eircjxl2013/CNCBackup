@@ -319,12 +319,11 @@ public class ControlPanel : MonoBehaviour {
 	
 	//刀偏界面完善---张振华---03.30
 	public GUIStyle sty_MostWords_ToolOffSet;        //刀偏界面字体
-	public List<bool> ToolOffSetPage = new List<bool>();
 	public int ToolOffSetPage_num = 0;
 	public int number = 0;
-	public int tool_setting = 1 ;
-	public float tool_setting_cursor_y = 81.5f;
-	public float tool_setting_cursor_w = 91.5f;
+	public int tool_setting = 1 ; //值为1-32，代表刀偏界面的每一个空格
+	public float tool_setting_cursor_y = 81.5f; //刀偏界面光标水平方向的值
+	public float tool_setting_cursor_w = 91.5f; //刀偏界面光标垂直方向的值
 	//刀偏界面完善---张振华---03.30
 
 	#endregion

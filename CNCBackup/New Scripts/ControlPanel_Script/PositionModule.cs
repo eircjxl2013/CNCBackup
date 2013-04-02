@@ -61,7 +61,6 @@ public class PositionModule : MonoBehaviour {
 				    xyzLastTime=Time.time;
 					Debug.Log("isXBlink");
 				}
-				
 			}
 			if(MDIInput_script.isYSelected)
 			{
@@ -94,7 +93,6 @@ public class PositionModule : MonoBehaviour {
 			ShowOperationScreen();
 			if(Main.runtimeIsBlink||Main.partsNumBlink)
 			{
-				//Debug.Log("dsfsdf");
 				if(Time.time-lastTime>0.5)
 				{
 					displayFlag=!displayFlag;
@@ -126,7 +124,6 @@ public class PositionModule : MonoBehaviour {
 		}
 		if(Main.operationBottomScrInitial&&zBlink&&zDisplayFlag)
 		{
-			
 			GUI.Label(new Rect(100,346f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Z",Main.sty_BottomAST);
 			//Debug.Log("打印Z");
 		}
@@ -161,12 +158,6 @@ public class PositionModule : MonoBehaviour {
 		if(Main.statusBeforeOperation==1)
 		{
 			GUI.Label(new Rect(40f/1000f*Main.width,28f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"绝对坐标", Main.sty_Title);
-	    	//GUI.Label(new Rect(40f/1000f*Main.width,422f/1000f*Main.height,20f/1000f*Main.width,25f/1000f*Main.height),"", Main.sty_BottomButtonSmallest);
-		    //GUI.Label(new Rect(171f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"相 对", Main.sty_BottomChooseMenu);
-	    	//GUI.Label(new Rect(261f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"综 合", Main.sty_BottomChooseMenu);
-	    	
-	    	//GUI.Label(new Rect(523f/1000f*Main.width,420f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"+", Main.sty_MostWords);
-			
 	    	GUI.Label(new Rect(60f/1000f*Main.width,65f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"X", Main.sty_BigXYZ);
 	    	GUI.Label(new Rect(140f/1000f*Main.width,65f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(CooSystem_script.absolute_pos.x), Main.sty_BigXYZ);
 	    	GUI.Label(new Rect(60f/1000f*Main.width,115f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Y", Main.sty_BigXYZ);
@@ -180,14 +171,14 @@ public class PositionModule : MonoBehaviour {
 		  //  GUI.Label(new Rect(40f/1000f*Main.width,422f/1000f*Main.height,20f/1000f*Main.width,25f/1000f*Main.height),"", Main.sty_BottomButtonSmallest);
 			//宋荣
 			if((Main.operationBottomScrInitial&&xBlink&&xDisplayFlag)||!MDIInput_script.isXSelected)
-		    GUI.Label(new Rect(60f/1000f*Main.width,65f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"X", Main.sty_BigXYZ);
+		    	GUI.Label(new Rect(60f/1000f*Main.width,65f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"X", Main.sty_BigXYZ);
 			
 		    GUI.Label(new Rect(140f/1000f*Main.width,65f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),  Main.CooStringGet(CooSystem_script.relative_pos.x), Main.sty_BigXYZ);
 			if((Main.operationBottomScrInitial&&yBlink&&yDisplayFlag)||!MDIInput_script.isYSelected)
-		    GUI.Label(new Rect(60f/1000f*Main.width,115f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Y", Main.sty_BigXYZ);
+		    	GUI.Label(new Rect(60f/1000f*Main.width,115f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Y", Main.sty_BigXYZ);
 	    	GUI.Label(new Rect(140f/1000f*Main.width,115f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(CooSystem_script.relative_pos.y), Main.sty_BigXYZ);
 			if((Main.operationBottomScrInitial&&zBlink&&zDisplayFlag)||!MDIInput_script.isZSelected)
-	    	GUI.Label(new Rect(60f/1000f*Main.width,165f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Z", Main.sty_BigXYZ);
+	    		GUI.Label(new Rect(60f/1000f*Main.width,165f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Z", Main.sty_BigXYZ);
 			//宋荣
 	    	GUI.Label(new Rect(140f/1000f*Main.width,165f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(CooSystem_script.relative_pos.z), Main.sty_BigXYZ);
 		}
@@ -198,16 +189,14 @@ public class PositionModule : MonoBehaviour {
 	    	GUI.Label(new Rect(113f/1000f*Main.width,57f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"相对坐标", Main.sty_PosSmallWord);
 			//宋荣
 			if((Main.operationBottomScrInitial&&xBlink&&xDisplayFlag)||!MDIInput_script.isXSelected)
-     		GUI.Label(new Rect(60f/1000f*Main.width,80f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"X", Main.sty_SmallXYZ);
-			
-			
+     			GUI.Label(new Rect(60f/1000f*Main.width,80f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"X", Main.sty_SmallXYZ);
+	
 	    	GUI.Label(new Rect(100f/1000f*Main.width,80f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(CooSystem_script.relative_pos.x), Main.sty_SmallNum);
 			if((Main.operationBottomScrInitial&&yBlink&&yDisplayFlag)||!MDIInput_script.isYSelected)
-		    GUI.Label(new Rect(60f/1000f*Main.width,105f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Y", Main.sty_SmallXYZ);
+		    	GUI.Label(new Rect(60f/1000f*Main.width,105f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Y", Main.sty_SmallXYZ);
 		    GUI.Label(new Rect(100f/1000f*Main.width,105f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(CooSystem_script.relative_pos.y), Main.sty_SmallNum);
 			if((Main.operationBottomScrInitial&&zBlink&&zDisplayFlag)||!MDIInput_script.isZSelected)
-				
-		    GUI.Label(new Rect(60f/1000f*Main.width,130f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Z", Main.sty_SmallXYZ);
+		    	GUI.Label(new Rect(60f/1000f*Main.width,130f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Z", Main.sty_SmallXYZ);
 			//宋荣
 		    GUI.Label(new Rect(100f/1000f*Main.width,130f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(CooSystem_script.relative_pos.z), Main.sty_SmallNum);
 
@@ -226,8 +215,7 @@ public class PositionModule : MonoBehaviour {
 	    	GUI.Label(new Rect(100f/1000f*Main.width,205f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(MoveControl_script.MachineCoo.y), Main.sty_SmallNum);
 	    	GUI.Label(new Rect(60f/1000f*Main.width,230f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"Z", Main.sty_SmallXYZ);
 	    	GUI.Label(new Rect(100f/1000f*Main.width,230f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.CooStringGet(MoveControl_script.MachineCoo.z), Main.sty_SmallNum);
-				
-				
+	
 	    	GUI.Label(new Rect(370f/1000f*Main.width,157f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"剩余移动量", Main.sty_PosSmallWord);
 	    	GUI.Label(new Rect(300f/1000f*Main.width,180f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"X", Main.sty_SmallXYZ);
 	     	GUI.Label(new Rect(360f/1000f*Main.width,180f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"     0.000", Main.sty_SmallNum);
@@ -345,7 +333,7 @@ public class PositionModule : MonoBehaviour {
 		//if(Main.partsNumBlink)
 			//Debug.Log("parttimeblink is true");
 	    if((Main.partsNumBlink&&displayFlag)||!Main.partsNumBlink)
-		GUI.Label(new Rect(290f/1000f*Main.width,280f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"加工零件数", Main.sty_MostWords);
+			GUI.Label(new Rect(290f/1000f*Main.width,280f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height),"加工零件数", Main.sty_MostWords);
 		//宋荣
 		GUI.Label(new Rect(452f/1000f*Main.width,278f/1000f*Main.height,500f/1000f*Main.width,300f/1000f*Main.height), Main.NumberFormat(Main.PartsNum), Main.sty_SmallNum);
 		//宋荣

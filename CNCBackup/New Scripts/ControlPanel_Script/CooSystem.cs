@@ -134,102 +134,125 @@ public class CooSystem : MonoBehaviour {
 	public void tool_down()
 	{
 		if(Main.tool_setting>=1&&Main.tool_setting<=28)
-	   Main.tool_setting  = Main.tool_setting + 4;
+	   		Main.tool_setting  += 4;
 		else if(Main.tool_setting == 29)
 		{
 			if(Main.ToolOffSetPage_num < 49)
-			Tool_pagedown();
-		Main.tool_setting = 1;
+			{
+				Tool_pagedown();
+				Main.tool_setting = 1;
+			}
 		}
 		else if(Main.tool_setting == 30)
 		{
 			if(Main.ToolOffSetPage_num < 49)
-			Tool_pagedown();
-		Main.tool_setting = 2;
+			{
+				Tool_pagedown();
+				Main.tool_setting = 2;
+			}
 		}
 		else if(Main.tool_setting == 31)
 		{
 			if(Main.ToolOffSetPage_num < 49)
-			Tool_pagedown();
-		Main.tool_setting = 3;
+			{
+				Tool_pagedown();
+				Main.tool_setting = 3;
+			}
 		}
 		else if(Main.tool_setting == 32)
 		{
 			if(Main.ToolOffSetPage_num < 49)
-			Tool_pagedown();
-		Main.tool_setting = 4;
+			{
+				Tool_pagedown();
+				Main.tool_setting = 4;
+			}
 		}
 		//Debug.Log(Main.tool_setting);
 		ToolCursorPos();
-		
 	}
 	
 	//刀偏界面上移
 	public void tool_up()
 	{
-		if(Main.tool_setting>=5&&Main.tool_setting<=32)
-	   Main.tool_setting  = Main.tool_setting - 4;
+		if(Main.tool_setting>=5 && Main.tool_setting<=32)
+	  		Main.tool_setting  -= 4;
 		else if(Main.tool_setting == 1)
 		{
 			if(Main.ToolOffSetPage_num > 0)
-			Tool_pageup();
-		Main.tool_setting = 29;
+			{
+				Tool_pageup();
+				Main.tool_setting = 29;
+			}
 		}
 	    else if(Main.tool_setting == 2)
 		{
 			if(Main.ToolOffSetPage_num > 0)
-			Tool_pageup();
-		Main.tool_setting = 30;
+			{
+				Tool_pageup();
+				Main.tool_setting = 30;
+			}
 		}
 		else if(Main.tool_setting == 3)
 		{
+			
 			if(Main.ToolOffSetPage_num > 0)
-			Tool_pageup();
-		Main.tool_setting = 31;
+			{
+				Tool_pageup();
+				Main.tool_setting = 31;
+			}
 		}
 		else if(Main.tool_setting == 4)
 		{
 			if(Main.ToolOffSetPage_num > 0)
-			Tool_pageup();
-		Main.tool_setting = 32;
+			{
+				Tool_pageup();
+				Main.tool_setting = 32;
+			}
 		}
-		//Debug.Log(Main.tool_setting);
 		ToolCursorPos();
 	}
 	
 	//刀偏界面右移
 	public void tool_right()
 	{
-		if(Main.tool_setting >= 1 && Main.tool_setting <=32)
+		if(Main.tool_setting == 32)
 		{
-		if(Main.tool_setting % 4 == 1 || Main.tool_setting % 4 == 2|| Main.tool_setting % 4 == 3)
-			Main.tool_setting  = Main.tool_setting + 1;
+			if(Main.ToolOffSetPage_num < 49)
+			{
+				Tool_pagedown();
+				Main.tool_setting = 1;
+			}
 		}
+		else
+			Main.tool_setting++;
 		ToolCursorPos();
-		//Debug.Log(Main.tool_setting );
 	}
 	//刀偏界面左移
 	public void tool_left()
 	{
-		if(Main.tool_setting >= 1 && Main.tool_setting <=32)
+		if(Main.tool_setting == 1)
 		{
-		if(Main.tool_setting % 4 == 0 || Main.tool_setting % 4 == 2|| Main.tool_setting % 4 == 3)
-			Main.tool_setting  = Main.tool_setting - 1;
+			if(Main.ToolOffSetPage_num > 0)
+			{
+				Tool_pageup();
+				Main.tool_setting = 32;
+			}
 		}
-		//Debug.Log(Main.tool_setting );
+		else
+			Main.tool_setting--;
 		ToolCursorPos();
 	}
 	
 	//刀偏页面下翻
 	public void Tool_pagedown()
 	{
-		Main.ToolOffSetPage_num = Main.ToolOffSetPage_num + 1;		
+		Main.ToolOffSetPage_num++;	
 	}
 	
 	//刀偏页面上翻
 	public void Tool_pageup()
 	{
-		Main.ToolOffSetPage_num = Main.ToolOffSetPage_num - 1;
+		Main.ToolOffSetPage_num--;
 	}
 	
 	//黄色背景图片
@@ -276,13 +299,19 @@ public class CooSystem : MonoBehaviour {
 	
 	public void SearchToolNo(string num_str)
 	{
-		string str_temp = num_str.TrimStart('0', ' ');
-		int num = int.Parse(str_temp);
-		if(num > 400 || num <= 0)
+		Regex isNum_Test = new Regex(@"\D+");
+		if(isNum_Test.IsMatch(num_str))
 		{
-			Debug.Log("请输入1~400");
+			Debug.Log("格式错误！请输入1-400");
 			return;
 		}
+		int num = int.Parse(num_str);
+		if(num > 400 || num <= 0)
+		{
+			Debug.Log("格式错误！请输入1-400");
+			return;
+		}
+		//Todo: to be modified.
 		if((num-1) % 8 == 0)
 		{
 			Main.ToolOffSetPage_num = ((num-1) / 8);
@@ -337,7 +366,6 @@ public class CooSystem : MonoBehaviour {
 	public void ReadToolFile () 
 	{
 		string line_str = "";
-		string tool_str ="";
 		StreamReader line_str_reader;
 		FileStream tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/shape_H.txt", FileMode.OpenOrCreate, FileAccess.Read);
 		line_str_reader = new StreamReader(tool_stream);
@@ -346,15 +374,16 @@ public class CooSystem : MonoBehaviour {
 		if(line_str == null)
 		{
 			for(int i = 0; i<400; i++)
-				shape_H[i] = 0f;
-			
+				shape_H[i] = 0f;	
 		}
 		else
 		{
 			for(int i = 0; i<400; i++)
 			{
-			    tool_str = line_str;
-       			shape_H[i] = float.Parse(tool_str);
+				if(line_str == null)
+					shape_H[i] = 0;
+				else
+					shape_H[i] = float.Parse(line_str);
 				line_str = line_str_reader.ReadLine();
 			}
 		}
@@ -364,15 +393,17 @@ public class CooSystem : MonoBehaviour {
 		line_str = line_str_reader.ReadLine();
 		if(line_str == null)
 		{
-			for(int i = 0;i<400;i++)
-			wear_H[i] = 0f;	
+			for(int i = 0; i<400; i++)
+				wear_H[i] = 0f;	
 		}
 		else
 		{
-			for(int i = 0;i<400;i++)
+			for(int i = 0; i<400; i++)
 			{
-				tool_str = line_str;
-				wear_H[i] = float.Parse(tool_str);
+				if(line_str == null)
+					wear_H[i] = 0;
+				else
+					wear_H[i] = float.Parse(line_str);
 				line_str = line_str_reader.ReadLine();
 			}
 		}
@@ -382,15 +413,17 @@ public class CooSystem : MonoBehaviour {
 		line_str = line_str_reader.ReadLine();
 		if(line_str == null)
 		{
-			for(int i = 0;i<400;i++)
-			shape_D[i] = 0f;	
+			for(int i = 0; i<400; i++)
+				shape_D[i] = 0f;	
 		}
 		else
 		{
-			for(int i = 0;i<400;i++)
+			for(int i = 0; i<400; i++)
 			{
-				tool_str = line_str;
-				shape_D[i] =  float.Parse(tool_str);
+				if(line_str == null)
+					shape_D[i] = 0;
+				else
+					shape_D[i] =  float.Parse(line_str);
 				line_str = line_str_reader.ReadLine();
 			}
 		}
@@ -400,43 +433,22 @@ public class CooSystem : MonoBehaviour {
 		line_str = line_str_reader.ReadLine();
 		if(line_str == null)
 		{
-			for(int i = 0;i<400;i++)
+			for(int i = 0; i<400; i++)
 			wear_D[i] = 0f;
 			
 		}
 		else
 		{
-			for(int i = 0;i<400;i++)
+			for(int i = 0; i<400; i++)
 			{
-				tool_str = line_str;
-				wear_D[i] =  float.Parse(tool_str);
+				if(line_str == null)
+					wear_D[i] = 0;
+				else
+					wear_D[i] =  float.Parse(line_str);
 				line_str = line_str_reader.ReadLine();
 			}
 		}
 		line_str_reader.Close();
-	}
-	
-	//刀偏写入文件名称选择
-	public void WriteToolChoose (int tool_select ) 
-	{
-		switch (tool_select)
-		{
-		case 1:
-			WriteToolFile("shape_H");
-			break;
-		case 2:
-			WriteToolFile("wear_H");
-			break;
-		case 3:
-			WriteToolFile("shape_D");
-			break;
-		case 4:
-			WriteToolFile("wear_D");
-			break;
-		default:
-			Debug.Log("out of range");
-			break;
-		}
 	}
 	
 	//刀偏写入功能
@@ -450,9 +462,32 @@ public class CooSystem : MonoBehaviour {
 		else
 			tool_stream = new FileStream(Application.dataPath+"/Resources/tool_parameter/"+filename+".txt", FileMode.Create, FileAccess.Write);
 		line_str_writer = new StreamWriter(tool_stream);
-		for(int i=0;i<400;i++)
+		switch(filename)
 		{
-		line_str_writer.WriteLine(write_tool_str[i]);
+		case "shape_H":
+			for(int i=0; i<400; i++)
+			{
+				line_str_writer.WriteLine(shape_H[i]);
+			}
+			break;
+		case "wear_H":
+			for(int i=0; i<400; i++)
+			{
+				line_str_writer.WriteLine(wear_H[i]);
+			}
+			break;
+		case "shape_D":
+			for(int i=0; i<400; i++)
+			{
+				line_str_writer.WriteLine(shape_D[i]);
+			}
+			break;
+		case "wear_D":
+			for(int i=0; i<400; i++)
+			{
+				line_str_writer.WriteLine(wear_D[i]);
+			}
+			break;
 		}
 		line_str_writer.Close();
 	}
@@ -466,8 +501,8 @@ public class CooSystem : MonoBehaviour {
 		{
 			if(Main.tool_setting == 1 || Main.tool_setting == 2|| Main.tool_setting == 5|| Main.tool_setting == 6|| Main.tool_setting == 9|| Main.tool_setting == 10|| Main.tool_setting == 13|| Main.tool_setting == 14|| Main.tool_setting == 17|| Main.tool_setting == 18|| Main.tool_setting == 21|| Main.tool_setting == 22|| Main.tool_setting == 25|| Main.tool_setting == 26|| Main.tool_setting == 29|| Main.tool_setting == 30)
 			{
-			value_f = relative_pos.z;
-			Write_choose( value_f, 1);
+				value_f = relative_pos.z;
+				Write_choose( value_f, 1);
 			}
 			else if(Main.tool_setting == 3 || Main.tool_setting == 4|| Main.tool_setting == 7|| Main.tool_setting == 8|| Main.tool_setting == 11|| Main.tool_setting == 12|| Main.tool_setting == 15|| Main.tool_setting == 16|| Main.tool_setting == 19|| Main.tool_setting == 20|| Main.tool_setting == 23|| Main.tool_setting == 24|| Main.tool_setting == 27|| Main.tool_setting == 28|| Main.tool_setting == 31|| Main.tool_setting == 32)
 		    return;
@@ -512,432 +547,303 @@ public class CooSystem : MonoBehaviour {
 		}
 		value_f = float.Parse(value_str);
 		if(plus_flag)
-			Write_choose( value_f, 2);
+			Write_choose(value_f, 2);
 		else
-			Write_choose( value_f, 3);
+			Write_choose(value_f, 3);
 	}
 	
 	//刀偏输入框选择
 	void Write_choose (float value_f, int mode_flag) 
 	{
-		
 		switch(Main.tool_setting)
 		{
 		case 1:
-				if(mode_flag == 1)
-					shape_H[Main.number ] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number ] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number ] = value_f; 
-		        for(int i=0;i<400;i++)
-			     {
-				     write_tool_str[i] =  shape_H[i];
-				     WriteToolChoose(1);
-			     }
-			 break;
+			if(mode_flag == 1)
+				shape_H[Main.number ] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number ] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number ] = value_f; 
+			WriteToolFile("shape_H");
+			break;
 		case 2:
-				if(mode_flag == 1)
-					wear_H[Main.number ] = value_f; 
-				else if(mode_flag == 2)
-					wear_H[Main.number ] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number ] = value_f; 
-			    for(int i=0;i<400;i++)	
-			    {
-	                write_tool_str[i] =  shape_H[i];			
-				    WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number ] = value_f; 
+			else if(mode_flag == 2)
+				wear_H[Main.number ] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number ] = value_f; 	
+			WriteToolFile("wear_H");
 			break;
 		case 3:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number ] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number ] = value_f;   
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-				    WriteToolChoose(3);
-			    } 
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number ] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number ] = value_f;   
+			WriteToolFile("shape_D");
 			break;
 		case 4:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number ] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number ] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			    } 
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number ] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number ] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 5:
-			    if(mode_flag == 1)
-					shape_H[Main.number +1] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +1] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +1] = value_f; 
-			    for(int i=0;i<400;i++) 	
-			     {
-			       write_tool_str[i] =  shape_H[i];
-			       WriteToolChoose(1);
-			     }
+			if(mode_flag == 1)
+				shape_H[Main.number +1] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +1] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +1] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 6:
-				if(mode_flag == 1)
-					wear_H[Main.number +1] = value_f; 
-				else if(mode_flag == 2)
-					wear_H[Main.number +1] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number +1] = value_f; 
-			    for(int i=0;i<400;i++) 	
-		    	{
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number +1] = value_f; 
+			else if(mode_flag == 2)
+				wear_H[Main.number +1] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number +1] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 7:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +1] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +1] = value_f; 
-			    for(int i=0;i<400;i++)
-			     {
-				     write_tool_str[i] =  shape_H[i];
-					 WriteToolChoose(3);
-			     }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +1] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +1] = value_f; 
+			WriteToolFile("shape_D");
 			break;
 		case 8:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +1] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +1] = value_f; 
-			    for(int i=0;i<400;i++)
-			     {
-				     write_tool_str[i] =  shape_H[i];
-					 WriteToolChoose(4);
-			     }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +1] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +1] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 9:
-				if(mode_flag == 1)
-					shape_H[Main.number +2] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +2] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +2] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(1);
-			    }
+			if(mode_flag == 1)
+				shape_H[Main.number +2] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +2] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +2] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 10:
-				if(mode_flag == 1)
-					wear_H[Main.number +2] = value_f;
-				else if(mode_flag == 2)
-					wear_H[Main.number +2] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number +2] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number +2] = value_f;
+			else if(mode_flag == 2)
+				wear_H[Main.number +2] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number +2] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 11:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +2] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +2] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(3);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +2] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +2] = value_f; 
+				WriteToolFile("shape_D");
 			break;
 		case 12:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +2] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +2] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +2] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +2] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 13:
-				if(mode_flag == 1)
-					shape_H[Main.number +3] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +3] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +3] = value_f; 
-			     for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(1);
-			    }
+			if(mode_flag == 1)
+				shape_H[Main.number +3] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +3] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +3] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 14:
-				if(mode_flag == 1)
-					wear_H[Main.number +3] = value_f;
-				else if(mode_flag == 2)
-					wear_H[Main.number +3] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number +3] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number +3] = value_f;
+			else if(mode_flag == 2)
+				wear_H[Main.number +3] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number +3] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 15:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +3] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +3] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(3);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +3] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +3] = value_f; 
+			WriteToolFile("shape_D");
 			break;
 		case 16:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +3] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +3] = value_f; 
-			    for(int i=0;i<400;i++) 
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +3] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +3] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 17:
-				if(mode_flag == 1)
-					shape_H[Main.number +4] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +4] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +4] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(1);
-			    }
+			if(mode_flag == 1)
+				shape_H[Main.number +4] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +4] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +4] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 18:
-				if(mode_flag == 1)
-					wear_H[Main.number +4] = value_f; 
-				else if(mode_flag == 2)
-					wear_H[Main.number +4] += value_f;
-				else if(mode_flag == 3)
-			 		wear_H[Main.number +4] = value_f; 
-			     for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number +4] = value_f; 
+			else if(mode_flag == 2)
+				wear_H[Main.number +4] += value_f;
+			else if(mode_flag == 3)
+			 	wear_H[Main.number +4] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 19:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +4] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +4] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(3);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +4] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +4] = value_f; 
+			WriteToolFile("shape_D");
 			break;
 		case 20:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +4] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +4] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			    }
+			if(mode_flag == 1)	
+				   return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +4] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +4] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 21:
-				if(mode_flag == 1)
-					shape_H[Main.number +5] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +5] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +5] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(1);
-			    }
+			if(mode_flag == 1)
+				shape_H[Main.number +5] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +5] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +5] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 22:
-				if(mode_flag == 1)
-					wear_H[Main.number +5] = value_f; 
-				else if(mode_flag == 2)
-					wear_H[Main.number +5] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number +5] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number +5] = value_f; 
+			else if(mode_flag == 2)
+				wear_H[Main.number +5] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number +5] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 23:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +5] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +5] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(3);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +5] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +5] = value_f; 
+			WriteToolFile("shape_D");
 			break;
 		case 24:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +5] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +5] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +5] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +5] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 25:
-				if(mode_flag == 1)
-					shape_H[Main.number +6] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +6] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +6] = value_f; 
-			     for(int i=0;i<400;i++)
-			     {
-				     write_tool_str[i] =  shape_H[i];
-					 WriteToolChoose(1);
-			     }
+			if(mode_flag == 1)
+				shape_H[Main.number +6] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +6] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +6] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 26:
-				if(mode_flag == 1)
-					wear_H[Main.number +6] = value_f; 
-				else if(mode_flag == 2)
-					wear_H[Main.number +6] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number +6] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-				    write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(2);
-			    }
+			if(mode_flag == 1)
+				wear_H[Main.number +6] = value_f; 
+			else if(mode_flag == 2)
+				wear_H[Main.number +6] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number +6] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 27:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +6] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +6] = value_f; 
-			     for(int i=0;i<400;i++)
-			     {
-			     	write_tool_str[i] =  shape_H[i];
-				 	WriteToolChoose(3);
-			     } 
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +6] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +6] = value_f; 
+			WriteToolFile("shape_D");
 			break;
 		case 28:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +6] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +6] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-			    	write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			    }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +6] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +6] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		case 29:
-				if(mode_flag == 1)
-					shape_H[Main.number +7] = value_f; 
-				else if(mode_flag == 2)
-					shape_H[Main.number +7] += value_f;
-				else if(mode_flag == 3)
-					shape_H[Main.number +7] = value_f; 
-			     for(int i=0;i<400;i++)
-			     {
-			     	write_tool_str[i] =  shape_H[i];
-				 	WriteToolChoose(1);
-			     }
+			if(mode_flag == 1)
+				shape_H[Main.number +7] = value_f; 
+			else if(mode_flag == 2)
+				shape_H[Main.number +7] += value_f;
+			else if(mode_flag == 3)
+				shape_H[Main.number +7] = value_f; 
+			WriteToolFile("shape_H");
 			break;
 		case 30:
-				if(mode_flag == 1)
-					wear_H[Main.number +7] = value_f; 
-				else if(mode_flag == 2)
-					wear_H[Main.number +7] += value_f;
-				else if(mode_flag == 3)
-					wear_H[Main.number +7] = value_f; 
-			    for(int i=0;i<400;i++)
-			     {
-				     write_tool_str[i] =  shape_H[i];
-					 WriteToolChoose(2);
-			     }
+			if(mode_flag == 1)
+				wear_H[Main.number +7] = value_f; 
+			else if(mode_flag == 2)
+				wear_H[Main.number +7] += value_f;
+			else if(mode_flag == 3)
+				wear_H[Main.number +7] = value_f; 
+			WriteToolFile("wear_H");
 			break;
 		case 31:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					shape_D[Main.number +7] += value_f;
-				else if(mode_flag == 3)
-					shape_D[Main.number +7] = value_f; 
-			     for(int i=0;i<400;i++)
-			     { 
-				     write_tool_str[i] =  shape_H[i];
-					 WriteToolChoose(3);
-			     }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				shape_D[Main.number +7] += value_f;
+			else if(mode_flag == 3)
+				shape_D[Main.number +7] = value_f; 
+			WriteToolFile("shape_D");
 			break;
 		case 32:
-				if(mode_flag == 1)	
-				    return;
-				else if(mode_flag == 2)
-					wear_D[Main.number +7] += value_f;
-				else if(mode_flag == 3)
-					wear_D[Main.number +7] = value_f; 
-			    for(int i=0;i<400;i++)
-			    {
-			    	write_tool_str[i] =  shape_H[i];
-					WriteToolChoose(4);
-			     }
+			if(mode_flag == 1)	
+				return;
+			else if(mode_flag == 2)
+				wear_D[Main.number +7] += value_f;
+			else if(mode_flag == 3)
+				wear_D[Main.number +7] = value_f; 
+			WriteToolFile("wear_D");
 			break;
 		default:
 			break;
@@ -1311,37 +1217,6 @@ public class CooSystem : MonoBehaviour {
 		line_str_reader.Close();
 	}
 	
-	public void WriteCooChoose (int coo_select , string write_str) 
-	{
-		switch (coo_select)
-		{
-		case 1:
-			WriteCooFile("G00", write_str);
-			break;
-		case 2:
-			WriteCooFile("G54", write_str);
-			break;
-		case 3:
-			WriteCooFile("G55", write_str);
-			break;
-		case 4:
-			WriteCooFile("G56", write_str);
-			break;
-		case 5:
-			WriteCooFile("G57", write_str);
-			break;
-		case 6:
-			WriteCooFile("G58", write_str);
-			break;
-		case 7:
-			WriteCooFile("G59", write_str);
-			break;
-		default:
-			Debug.Log("out of range");
-			break;
-		}
-	}
-	
 	void WriteCooFile (string filename, string write_str)
 	{
 		StreamWriter line_str_writer;
@@ -1446,7 +1321,7 @@ public class CooSystem : MonoBehaviour {
 	
 	public void Up () 
 	{
-		switch (Main.coo_setting_1)
+		switch(Main.coo_setting_1)
 		{
 		case 1:
 			if(Main.coo_setting_2 == 2)
@@ -1535,12 +1410,59 @@ public class CooSystem : MonoBehaviour {
 	{
 		switch(Main.coo_setting_1)
 		{
+		case 1:
+			if(Main.coo_setting_2 == 3 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2--;
+				Main.coo_setting_1 = 3;
+				CooCursorPos();
+			}
+			break;
+		case 2:
+			if(Main.coo_setting_2 == 3 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2--;
+				Main.coo_setting_1 = 4;
+			}
+			else
+			{
+				Main.coo_setting_1 = 3;
+				Main.coo_setting_2 = 3;
+			}
+			CooCursorPos();
+			break;
 		case 3:
 			Main.coo_setting_1 = 1;
 			CooCursorPos();
 			break;
 		case 4:
 			Main.coo_setting_1 = 2;
+			CooCursorPos();
+			break;
+		case 5:
+			if(Main.coo_setting_2 == 3 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2--;
+				Main.coo_setting_1 = 7;
+			}
+			else
+			{
+				Main.coo_setting_1 = 4;
+				Main.coo_setting_2 = 3;
+				Main.OffCooFirstPage = true;
+			}
+			CooCursorPos();
+			break;
+		case 6:
+			if(Main.coo_setting_2 == 3 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2--;
+			}
+			else
+			{
+				Main.coo_setting_1 = 7;
+				Main.coo_setting_2 = 3;
+			}
 			CooCursorPos();
 			break;
 		case 7:
@@ -1562,8 +1484,55 @@ public class CooSystem : MonoBehaviour {
 			Main.coo_setting_1 = 4;
 			CooCursorPos();
 			break;
+		case 3:
+			if(Main.coo_setting_2 == 1 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2++;
+				Main.coo_setting_1 = 1;
+			}
+			else
+			{
+				Main.coo_setting_1 = 2;
+				Main.coo_setting_2 = 1;
+			}
+			CooCursorPos();
+			break;
+		case 4:
+			if(Main.coo_setting_2 == 1 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2++;
+				Main.coo_setting_1 = 2;
+			}
+			else
+			{
+				Main.coo_setting_1 = 5;
+				Main.coo_setting_2 = 1;
+				Main.OffCooFirstPage = false;
+			}
+			CooCursorPos();
+			break;
 		case 5:
 			Main.coo_setting_1 = 7;
+			CooCursorPos();
+			break;
+		case 6:
+			if(Main.coo_setting_2 == 1 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2++;
+				CooCursorPos();
+			}
+			break;
+		case 7:
+			if(Main.coo_setting_2 == 1 || Main.coo_setting_2 == 2)
+			{
+				Main.coo_setting_2++;
+				Main.coo_setting_1 = 5;
+			}
+			else
+			{
+				Main.coo_setting_1 = 6;
+				Main.coo_setting_2 = 1;
+			}
 			CooCursorPos();
 			break;
 		}
@@ -1700,6 +1669,7 @@ public class CooSystem : MonoBehaviour {
 			Main.OffCooFirstPage = false;
 			break;
 		default:
+			Debug.Log("格式不正确");
 			break;
 		}
 	}
@@ -1808,7 +1778,7 @@ public class CooSystem : MonoBehaviour {
 	void Measure_choose (int xyz_select, float value_f, int mode_flag) 
 	{
 		string write_str = "";
-		switch (Main.coo_setting_1)
+		switch(Main.coo_setting_1)
 		{
 		case 1:
 			if(xyz_select == 1)
@@ -1820,7 +1790,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G00_pos.x = value_f; 
 				write_str = G00_pos.x+","+G00_pos.y+","+G00_pos.z;
-				WriteCooChoose(1,write_str);
+				WriteCooFile("G00", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -1831,7 +1801,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G00_pos.y = value_f; 
 				write_str = G00_pos.x+","+G00_pos.y+","+G00_pos.z;
-				WriteCooChoose(1,write_str);
+				WriteCooFile("G00", write_str);
 			}
 			else
 			{
@@ -1842,7 +1812,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G00_pos.z = value_f; 
 				write_str = G00_pos.x+","+G00_pos.y+","+G00_pos.z;
-				WriteCooChoose(1,write_str);
+				WriteCooFile("G00", write_str);
 			}
 			Main.OffCooFirstPage = true;
 			Workpiece_Change();
@@ -1857,7 +1827,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G54_pos.x = value_f; 
 				write_str = G54_pos.x+","+G54_pos.y+","+G54_pos.z;
-				WriteCooChoose(2,write_str);
+				WriteCooFile("G54", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -1868,7 +1838,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G54_pos.y = value_f; 
 				write_str = G54_pos.x+","+G54_pos.y+","+G54_pos.z;
-				WriteCooChoose(2,write_str);
+				WriteCooFile("G54", write_str);
 			}
 			else
 			{
@@ -1879,7 +1849,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G54_pos.z = value_f; 
 				write_str = G54_pos.x+","+G54_pos.y+","+G54_pos.z;
-				WriteCooChoose(2,write_str);
+				WriteCooFile("G54", write_str);
 			}
 			Main.OffCooFirstPage = true;
 			Workpiece_Change();
@@ -1894,7 +1864,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G55_pos.x = value_f; 
 				write_str = G55_pos.x+","+G55_pos.y+","+G55_pos.z;
-				WriteCooChoose(3,write_str);
+				WriteCooFile("G55", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -1905,7 +1875,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G55_pos.y = value_f; 
 				write_str = G55_pos.x+","+G55_pos.y+","+G55_pos.z;
-				WriteCooChoose(3,write_str);
+				WriteCooFile("G55", write_str);
 			}
 			else
 			{
@@ -1916,7 +1886,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G55_pos.z = value_f; 
 				write_str = G55_pos.x+","+G55_pos.y+","+G55_pos.z;
-				WriteCooChoose(3,write_str);
+				WriteCooFile("G55", write_str);
 			}
 			Main.OffCooFirstPage = true;
 			Workpiece_Change();
@@ -1931,7 +1901,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G56_pos.x = value_f; 
 				write_str = G56_pos.x+","+G56_pos.y+","+G56_pos.z;
-				WriteCooChoose(4,write_str);
+				WriteCooFile("G56", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -1942,7 +1912,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G56_pos.y = value_f;
 				write_str = G56_pos.x+","+G56_pos.y+","+G56_pos.z;
-				WriteCooChoose(4,write_str);
+				WriteCooFile("G56", write_str);
 			}
 			else
 			{
@@ -1953,7 +1923,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G56_pos.z = value_f;
 				write_str = G56_pos.x+","+G56_pos.y+","+G56_pos.z;
-				WriteCooChoose(4,write_str);
+				WriteCooFile("G56", write_str);
 			}
 			Main.OffCooFirstPage = true;
 			Workpiece_Change();
@@ -1968,7 +1938,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G57_pos.x = value_f;
 				write_str = G57_pos.x+","+G57_pos.y+","+G57_pos.z;
-				WriteCooChoose(5,write_str);
+				WriteCooFile("G57", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -1979,7 +1949,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G57_pos.y = value_f;
 				write_str = G57_pos.x+","+G57_pos.y+","+G57_pos.z;
-				WriteCooChoose(5,write_str);
+				WriteCooFile("G57", write_str);
 			}
 			else
 			{
@@ -1990,7 +1960,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G57_pos.z = value_f;
 				write_str = G57_pos.x+","+G57_pos.y+","+G57_pos.z;
-				WriteCooChoose(5,write_str);
+				WriteCooFile("G57", write_str);
 			}
 			Main.OffCooFirstPage = false;
 			Workpiece_Change();
@@ -2005,7 +1975,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G58_pos.x = value_f;
 				write_str = G58_pos.x+","+G58_pos.y+","+G58_pos.z;
-				WriteCooChoose(6,write_str);
+				WriteCooFile("G58", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -2016,7 +1986,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G58_pos.y = value_f;
 				write_str = G58_pos.x+","+G58_pos.y+","+G58_pos.z;
-				WriteCooChoose(6,write_str);
+				WriteCooFile("G58", write_str);
 			}
 			else
 			{
@@ -2027,7 +1997,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G58_pos.z = value_f;
 				write_str = G58_pos.x+","+G58_pos.y+","+G58_pos.z;
-				WriteCooChoose(6,write_str);
+				WriteCooFile("G58", write_str);
 			}
 			Main.OffCooFirstPage = false;
 			Workpiece_Change();
@@ -2042,7 +2012,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G59_pos.x = value_f;
 				write_str = G59_pos.x+","+G59_pos.y+","+G59_pos.z;
-				WriteCooChoose(7,write_str);
+				WriteCooFile("G59", write_str);
 			}
 			else if(xyz_select == 2)
 			{
@@ -2053,7 +2023,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G59_pos.y = value_f;
 				write_str = G59_pos.x+","+G59_pos.y+","+G59_pos.z;
-				WriteCooChoose(7,write_str);
+				WriteCooFile("G59", write_str);
 			}
 			else
 			{
@@ -2064,7 +2034,7 @@ public class CooSystem : MonoBehaviour {
 				else
 					G59_pos.z = value_f;
 				write_str = G59_pos.x+","+G59_pos.y+","+G59_pos.z;
-				WriteCooChoose(7,write_str);
+				WriteCooFile("G59", write_str);
 			}
 			Main.OffCooFirstPage = false;
 			Workpiece_Change();

@@ -144,6 +144,7 @@ public class MDIEditModule : MonoBehaviour {
 					{
 						CooSystem_script.tool_left();
 					}
+					//坐标系界面光标左移
 					if(Main.OffSetCoo)
 					{
 						CooSystem_script.Left();
@@ -187,6 +188,7 @@ public class MDIEditModule : MonoBehaviour {
 					{
 					CooSystem_script.tool_right();
 					}
+					//坐标系界面光标右移
 					if(Main.OffSetCoo)
 					{
 						CooSystem_script.Right();
