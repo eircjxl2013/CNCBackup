@@ -170,6 +170,13 @@ public class SoftkeyModule : MonoBehaviour {
 				}
 			}
 		}
+		//内容--AUTO模式下，程序界面向前翻页的功能
+		//姓名--刘旋，时间--2013-3-25
+		if(Main.ProgAUTO)
+		{
+			if(Main.ProgAUTOFlip==1)
+				Main.ProgAUTOFlip=0;
+		}//增加内容到此
 		//设置界面时按下
 		if(Main.SettingMenu)
 		{
@@ -382,6 +389,13 @@ public class SoftkeyModule : MonoBehaviour {
 					}
 				}
 			}//2 level
+			//内容--AUTO模式下，程序界面，第二个按钮的功能
+			//姓名--刘旋，时间--2013-3-25
+			if (Main.ProgAUTO)
+			{
+				if(Main.ProgAUTOFlip==0)
+					Main.ProgAUTOFlip=2;
+			}//增加内容到此
 		}//1 level
 		
 		if(Main.SettingMenu)
@@ -434,6 +448,14 @@ public class SoftkeyModule : MonoBehaviour {
 	
 				}
 			}//变化内容到此
+			
+			//内容--AUTO模式下，程序界面，第三个按钮的功能
+			//姓名--刘旋，时间--2013-3-25
+			if (Main.ProgAUTO)
+			{
+				if(Main.ProgAUTOFlip==0)
+					Main.ProgAUTOFlip=3;
+			}//增加能容到此
 		}
 		//设置界面时按下
 		if(Main.SettingMenu)
@@ -598,6 +620,17 @@ public class SoftkeyModule : MonoBehaviour {
 						Main.ProgEDITFlip = 1;
 				}
 			}
+			//内容--AUTO模式下，程序界面第五个按钮的功能
+			//姓名--刘旋，时间--2013-3-25
+			if(Main.ProgAUTO)
+			{
+				if (Main.ProgAUTOFlip==0)
+					Main.ProgAUTOFlip=1;
+				else if(Main.ProgAUTOFlip==2)
+					Main.ProgAUTOFlip=1;
+				else if (Main.ProgAUTOFlip==3)
+					Main.ProgAUTOFlip=1;
+			}//增加内容到此
 		}
 		
 		if(Main.SettingMenu)

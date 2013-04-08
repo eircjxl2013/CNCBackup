@@ -122,6 +122,9 @@ public class ControlPanel : MonoBehaviour {
 	public GUIStyle sty_ProgEDITListWindowNum;
 	public GUIStyle sty_Cursor;
 	public GUIStyle sty_Warning;
+	//内容--定义sty-Mode，用于显示模态
+	//姓名--刘旋，时间--2013-3-29
+	public GUIStyle sty_Mode;
 	
 	//button按钮style
 	public GUIStyle sty_NCPowerOn;
@@ -204,6 +207,9 @@ public class ControlPanel : MonoBehaviour {
 	public bool ProgEDITProg = true;
 	public bool ProgEDITList = false;
 	public int ProgEDITFlip = 0;
+	//内容--定义变量ProgAUTOFlip，用于控制AUTO模式下屏幕的显示
+	//姓名--刘旋，时间--2013-3-25
+	public int ProgAUTOFlip=0;
 	public int ProgSharedFlip = 0;
 	public int ProgSharedView = 0;
 	public int ProgUsedNum = 0;
@@ -413,7 +419,7 @@ public class ControlPanel : MonoBehaviour {
 			break;
 		case 3:
 			t2d_ModeSelect = t2d_ModeSelectAUTO;
-			MenuDisplay = "AUTO";
+			MenuDisplay = "MEM";
 			ProgEDIT = false;
 			ProgDNC = false;
 			ProgAUTO = true;
@@ -681,6 +687,12 @@ public class ControlPanel : MonoBehaviour {
 		//sty_Code.font = (Font)Resources.Load("font/dutch");
 		sty_Code.fontSize = 17;
 		sty_Code.fontStyle = FontStyle.Bold;
+		
+		//内容--sty-Mode赋值为蓝色
+		//姓名--刘旋，时间--2013-3-29
+		sty_Mode.fontSize=17;
+		sty_Mode.fontStyle=FontStyle.Bold;
+		sty_Mode.normal.textColor=Color.blue;
 		
 		sty_ProgEDITListWindowNum.font = (Font)Resources.Load("font/monoMMM_5");
 		sty_ProgEDITListWindowNum.fontSize = 13;
