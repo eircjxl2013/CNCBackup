@@ -171,12 +171,21 @@ public class SoftkeyModule : MonoBehaviour {
 			}
 		}
 		//内容--AUTO模式下，程序界面向前翻页的功能
-		//姓名--刘旋，时间--2013-3-25
-		if(Main.ProgAUTO)
-		{
-			if(Main.ProgAUTOFlip==1)
-				Main.ProgAUTOFlip=0;
-		}//增加内容到此
+			//姓名--刘旋，时间--2013-3-25
+			if(Main.ProgAUTO)
+			{
+				if(Main.ProgAUTOFlip==1)//“操作”页返回“程序”页
+					Main.ProgAUTOFlip=0;
+				//内容--AUTO模式下，程序界面向前翻页按钮功能的修改，姓名--刘旋，时间--2013-4-9
+			    if(Main.ProgAUTOFlip==2)//“绝对”页返回“程序”页
+					Main.ProgAUTOFlip=0;
+				if(Main.ProgAUTOFlip==3)//“当前段”页返回“程序”页
+					Main.ProgAUTOFlip=0;
+				if(Main.ProgAUTOFlip==4)//“相对”页返回“程序”页
+					Main.ProgAUTOFlip=0;
+				if(Main.ProgAUTOFlip==5)//“下一段”页返回“程序”页
+					Main.ProgAUTOFlip=0;
+			}//增加内容到此
 		//设置界面时按下
 		if(Main.SettingMenu)
 		{
@@ -275,6 +284,15 @@ public class SoftkeyModule : MonoBehaviour {
 					 	Main.ProgEDITList = false;
 				     }
 				}	
+			}
+			if(Main.ProgAUTO)//内容--AUTO模式下，程序界面，第一个按钮的功能，姓名--刘旋，时间--2013-4-9
+			{
+				if(Main.ProgAUTOFlip==3)//“当前段”页，按下“程序”按钮，转到“程序”页
+					Main.ProgAUTOFlip=0;
+				if(Main.ProgAUTOFlip==5)//“下一段”页，按下“程序”按钮，转到“程序”页
+					Main.ProgAUTOFlip=0;
+				if(Main.ProgAUTOFlip==4)//“相对”页，按下“绝对”按钮，转到“绝对”页
+					Main.ProgAUTOFlip=2;
 			}
 		}
 		//设置界面时按下
@@ -389,12 +407,13 @@ public class SoftkeyModule : MonoBehaviour {
 					}
 				}
 			}//2 level
-			//内容--AUTO模式下，程序界面，第二个按钮的功能
-			//姓名--刘旋，时间--2013-3-25
 			if (Main.ProgAUTO)
 			{
-				if(Main.ProgAUTOFlip==0)
+				if(Main.ProgAUTOFlip==0)//“程序”页，按下“检测”按钮，转到“绝对”页
 					Main.ProgAUTOFlip=2;
+				//内容--AUTO模式下，程序界面，第二个按钮功能的修改，姓名--刘旋，时间--2013-4-9
+				if(Main.ProgAUTOFlip==2)//“绝对”页，按下“相对”按钮，转到“相对”页
+				    Main.ProgAUTOFlip=4;
 			}//增加内容到此
 		}//1 level
 		
@@ -453,7 +472,10 @@ public class SoftkeyModule : MonoBehaviour {
 			//姓名--刘旋，时间--2013-3-25
 			if (Main.ProgAUTO)
 			{
-				if(Main.ProgAUTOFlip==0)
+				if(Main.ProgAUTOFlip==0)//“程序”页，按下“当前段”按钮，转到“当前段”页
+					Main.ProgAUTOFlip=3;
+				//内容--AOTO模式下，程序界面，第三个按钮功能的修改，姓名--刘旋，时间--2013-4-9
+				if(Main.ProgAUTOFlip==5)//“下一度”页，按下“当前段”按钮，转到“当前段”页
 					Main.ProgAUTOFlip=3;
 			}//增加能容到此
 		}
@@ -499,21 +521,31 @@ public class SoftkeyModule : MonoBehaviour {
 		
 		if(Main.ProgMenu)
 		{
-			if(Main.ProgEDITFlip == 0)
+			if(Main.ProgEDIT)
 			{
-				
+				if(Main.ProgEDITFlip == 0)
+				{
+					
+				}
+				else if(Main.ProgEDITFlip == 1)
+				{
+					
+				}
+				else if(Main.ProgEDITFlip == 2)
+				{
+					
+				}
+				else 
+				{
+					
+				}
 			}
-			else if(Main.ProgEDITFlip == 1)
+			if(Main.ProgAUTO)//内容--AUTO模式下，程序界面，第四个按钮的功能，姓名--刘旋，时间--2013-4-9
 			{
-				
-			}
-			else if(Main.ProgEDITFlip == 2)
-			{
-				
-			}
-			else 
-			{
-				
+				if(Main.ProgAUTOFlip==0)//“程序”页，按下“下一段”按钮，转到“下一段”页
+					Main.ProgAUTOFlip=5;
+				else if(Main.ProgAUTOFlip==3)//“当前段”页，按下“下一段”按钮，转到“下一段”页
+					Main.ProgAUTOFlip=5;
 			}
 		}
 		
@@ -624,11 +656,16 @@ public class SoftkeyModule : MonoBehaviour {
 			//姓名--刘旋，时间--2013-3-25
 			if(Main.ProgAUTO)
 			{
-				if (Main.ProgAUTOFlip==0)
+				if (Main.ProgAUTOFlip==0)//“程序”页，按下“操作”按钮，转到“操作”页
 					Main.ProgAUTOFlip=1;
-				else if(Main.ProgAUTOFlip==2)
+				else if(Main.ProgAUTOFlip==2)//“绝对”页，按下“操作”按钮，转到“操作”页
 					Main.ProgAUTOFlip=1;
-				else if (Main.ProgAUTOFlip==3)
+				else if (Main.ProgAUTOFlip==3)//“当前段”页，按下“操作”按钮，转到“操作”页
+					Main.ProgAUTOFlip=1;
+				//内容--AUTO模式下，程序界面，第五个按钮功能的修改，姓名--刘旋，时间--2013-4-9
+				else if(Main.ProgAUTOFlip==4)//“相对”页，按下“操作”按钮，转到“操作”页
+					Main.ProgAUTOFlip=1;
+				else if(Main.ProgAUTOFlip==5)//“下一段”页，按下“操作”按钮，转到“操作”页
 					Main.ProgAUTOFlip=1;
 			}//增加内容到此
 		}
@@ -730,6 +767,11 @@ public class SoftkeyModule : MonoBehaviour {
 						Main.ProgEDITList = false;
 					}
 				}
+			}
+			if(Main.ProgAUTO)//内容--AUTO模式下，程序界面，向后翻页按钮功能的修改，姓名--刘旋，时间--2013-4-9
+			{
+				if(Main.ProgAUTOFlip==1)//“操作”页，按“+”按钮，返回“程序”页
+					Main.ProgAUTOFlip=0;
 			}
 		}
 		
