@@ -407,14 +407,20 @@ public class SoftkeyModule : MonoBehaviour {
 					}
 				}
 			}//2 level
+			
 			if (Main.ProgAUTO)
 			{
 				if(Main.ProgAUTOFlip==0)//“程序”页，按下“检测”按钮，转到“绝对”页
 					Main.ProgAUTOFlip=2;
 				//内容--AUTO模式下，程序界面，第二个按钮功能的修改，姓名--刘旋，时间--2013-4-9
-				if(Main.ProgAUTOFlip==2)//“绝对”页，按下“相对”按钮，转到“相对”页
+				else if(Main.ProgAUTOFlip==2)//“绝对”页，按下“相对”按钮，转到“相对”页
 				    Main.ProgAUTOFlip=4;
+				else if(Main.ProgAUTOFlip==3)//内容--“当前段”页，按下“检索”按钮，转到“绝对”页，姓名--刘旋，时间--2013-4-11
+				    Main.ProgAUTOFlip=2;
+				else if(Main.ProgAUTOFlip==5)//内容--“下一段”页，按下“检索”按钮，转到“绝对”页，姓名--刘旋，时间--2013-4-11
+				    Main.ProgAUTOFlip=2;
 			}//增加内容到此
+			
 		}//1 level
 		
 		if(Main.SettingMenu)
@@ -772,6 +778,12 @@ public class SoftkeyModule : MonoBehaviour {
 			{
 				if(Main.ProgAUTOFlip==1)//“操作”页，按“+”按钮，返回“程序”页
 					Main.ProgAUTOFlip=0;
+				else if(Main.ProgAUTOFlip==0)//内容--“程序”页，按“+”按钮，返回“操作”页，姓名--刘旋，时间--2013-4-11
+					Main.ProgAUTOFlip=1;
+				else if(Main.ProgAUTOFlip==3)//内容--“当前段”页，按“+”按钮，返回“操作”页，姓名--刘旋，时间--2013-4-11
+					Main.ProgAUTOFlip=1;
+				else if(Main.ProgAUTOFlip==5)//内容--“下一段”页，按“+”按钮，返回“操作”页，姓名--刘旋，时间--2013-4-11
+					Main.ProgAUTOFlip=1;
 			}
 		}
 		

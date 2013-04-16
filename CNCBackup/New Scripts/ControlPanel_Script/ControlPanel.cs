@@ -22,6 +22,7 @@ public class ControlPanel : MonoBehaviour {
 	SpindleControl SpindleControl_script;
 	CooSystem CooSystem_script;
 	CompileNC CompileNC_script;
+	AuxiliaryMoveModule AuxiliaryMove_Script;
 	#endregion
 	
 	#region Defined variable
@@ -32,11 +33,11 @@ public class ControlPanel : MonoBehaviour {
 	//姓名--刘旋，时间--2013-4-8
 	public bool F0_flag=false;
 	public bool F25_flag=false;
-	public bool F50_flag=true;//默认50%按钮时按下状态
+	public bool F50_flag=false;//默认50%按钮时按下状态
 	public bool F100_flag=false;//增加内容到此 2013-4-8
 	//内容--定义整形变量SlowSpeedMode，用于指示慢常速下的按键状态，SlowSpeedMode=0，表示F0按下，SlowSpeedMode=1，表示25%按下
 	//SlowSpeedMode=2，表示50%按下，SlowSpeedMode=3，表示100%按下，姓名--刘旋，时间--2013-4-8
-	public int SlowSpeedMode=2;//增加内容到此  2013-4-8
+	public int RapidSpeedMode=2;//增加内容到此  2013-4-8
 	Rect PanelWindowRect = new Rect(0, 0, 670, 650);   
 	public float timeV = 0;
 	
@@ -396,7 +397,8 @@ public class ControlPanel : MonoBehaviour {
 		MachineFunction_Script = gameObject.GetComponent<MachineFunctionModule>();
 		gameObject.AddComponent("AuxiliaryFunctionModule");
 		AuxiliaryFunction_Script = gameObject.GetComponent<AuxiliaryFunctionModule>();
-		
+		gameObject.AddComponent("AuxiliaryMoveModule");
+		AuxiliaryMove_Script = gameObject.GetComponent<AuxiliaryMoveModule>();
 		GameObject.Find("move_control").AddComponent("MoveControl");
 		MoveControl_script = GameObject.Find("move_control").GetComponent<MoveControl>();
 		GameObject.Find("spindle_control").AddComponent("SpindleControl");
@@ -503,7 +505,7 @@ public class ControlPanel : MonoBehaviour {
 		case 7:
 			t2d_ModeSelect = t2d_ModeSelectREF;
 			MenuDisplay = "REF";
-			MoveControl_script.speed_to_move = 0.08333F;//内容--归零操作的实际速度为5m/min=(5/60)m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为5/60,姓名--刘旋，时间--2013-4-8
+			MoveControl_script.speed_to_move = 0.6F;//内容--归零操作的实际速度为5m/min=(5/60)m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为5/60,姓名--刘旋，时间--2013-4-8
 			ProgEDIT = false;
 			ProgDNC = false;
 			ProgAUTO = false;
@@ -664,8 +666,8 @@ public class ControlPanel : MonoBehaviour {
 		t2d_f50_on_d=(Texture2D)Resources.Load("Texture_Panel/Button/f50_on_d");
 		t2d_f50_off_u=(Texture2D)Resources.Load("Texture_Panel/Button/f50_off_u");
 		t2d_f50_off_d=(Texture2D)Resources.Load("Texture_Panel/Button/f50_off_d");
-		sty_ButtonF50.normal.background=t2d_f50_on_u;
-		sty_ButtonF50.active.background=t2d_f50_on_d;
+		sty_ButtonF50.normal.background=t2d_f50_off_u;
+		sty_ButtonF50.active.background=t2d_f50_off_d;
 		
 		t2d_f100_on_u=(Texture2D)Resources.Load("Texture_Panel/Button/f100_on_u");
 		t2d_f100_on_d=(Texture2D)Resources.Load("Texture_Panel/Button/f100_on_d");
@@ -914,6 +916,7 @@ public class ControlPanel : MonoBehaviour {
 			
 			//打印编辑区域
 			ScreenPrintArea();	
+			SpeedModule();//内容--增加行数SpeedModule用于控制时速度，姓名--刘旋，时间--2013-4-16
 		}
 		
 		//以上部分为屏幕显示区域，所有有关屏幕GUI效果的变化都通过上述函数增添和编辑
@@ -1051,6 +1054,14 @@ public class ControlPanel : MonoBehaviour {
 		GUI.DragWindow();    
 	}
 	
+	void SpeedModule()//内容--增加行数SpeedModule用于控制时速度，姓名--刘旋，时间--2013-4-16
+	{
+		if(MoveControl_script.x_p||MoveControl_script.x_n||MoveControl_script.y_p||MoveControl_script.y_n||MoveControl_script.z_p||MoveControl_script.z_n)
+			RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);
+		else 
+			RunningSpeed=0;	
+	}
+	
 	void ScreenNormallyOn() {
 		
 		GUI.Box(new Rect(40f/1000f*width,30f/1000f*height,500f/1000f*width,420f/1000f*height),"", sty_ScreenBackGround);
@@ -1130,6 +1141,7 @@ public class ControlPanel : MonoBehaviour {
 				ScreenCover = true;
 				power_notification = false;
 			    StartCoroutine(ScreenCoverSet());
+				F_operationButton();
 			}
 			ScreenPower = true;
 		}
@@ -1142,8 +1154,94 @@ public class ControlPanel : MonoBehaviour {
 				sty_NCPowerOn.normal.background = t2d_NCPower_on_u;
 				ScreenCover = true;
 			    StartCoroutine(ScreenCoverSet());
+				F_operationButton();
 			}
 			ScreenPower = false;
+		}
+	}
+	
+	void F_operationButton()//内容--控制电源关闭和开启时F0，F25,F50,F100按钮的状态，姓名--刘旋，时间--2013-4-12
+	{
+		if(ScreenPower==false)
+		{
+			if(PlayerPrefs.HasKey("F_SpeedMode"))
+			    RapidSpeedMode = PlayerPrefs.GetInt("F_SpeedMode");
+		    else
+		    {
+			    PlayerPrefs.SetInt("F_SpeedMode", 2);
+			    RapidSpeedMode = 2;
+		    }
+			switch(RapidSpeedMode)
+			{
+			case 0:
+				F0_flag=true;
+				F25_flag=false;
+				F50_flag=false;
+				F100_flag=false;
+				sty_ButtonF0.active.background=t2d_f0_on_d;
+				sty_ButtonF0.normal.background=t2d_f0_on_u; 
+				sty_ButtonF25.active.background=t2d_f25_off_d;
+				sty_ButtonF25.normal.background=t2d_f25_off_u;
+				sty_ButtonF50.active.background=t2d_f50_off_d;
+				sty_ButtonF50.normal.background=t2d_f50_off_u;
+				sty_ButtonF100.active.background=t2d_f100_off_d;
+				sty_ButtonF100.normal.background=t2d_f100_off_u;
+				break;
+			case 1:
+				F0_flag=false;
+				F25_flag=true;
+				F50_flag=false;
+				F100_flag=false;
+				sty_ButtonF25.active.background=t2d_f25_on_d;
+				sty_ButtonF25.normal.background=t2d_f25_on_u;						    
+				sty_ButtonF0.active.background=t2d_f0_off_d;
+				sty_ButtonF0.normal.background=t2d_f0_off_u;
+				sty_ButtonF50.active.background=t2d_f50_off_d;
+				sty_ButtonF50.normal.background=t2d_f50_off_u;
+				sty_ButtonF100.active.background=t2d_f100_off_d;
+				sty_ButtonF100.normal.background=t2d_f100_off_u;
+				break;
+			case 2:
+				F0_flag=false;
+				F25_flag=false;
+				F50_flag=true;
+				F100_flag=false;
+				sty_ButtonF50.active.background=t2d_f50_on_d;
+				sty_ButtonF50.normal.background=t2d_f50_on_u;
+				sty_ButtonF0.active.background=t2d_f0_off_d;
+				sty_ButtonF0.normal.background=t2d_f0_off_u;
+				sty_ButtonF25.active.background=t2d_f25_off_d;
+				sty_ButtonF25.normal.background=t2d_f25_off_u;
+				sty_ButtonF100.active.background=t2d_f100_off_d;
+				sty_ButtonF100.normal.background=t2d_f100_off_u;
+				break;
+			case 3:
+				F0_flag=false;
+				F25_flag=false;
+				F50_flag=false;
+				F100_flag=true;
+				sty_ButtonF100.active.background=t2d_f100_on_d;
+				sty_ButtonF100.normal.background=t2d_f100_on_u;						    
+				sty_ButtonF0.active.background=t2d_f0_off_d;
+				sty_ButtonF0.normal.background=t2d_f0_off_u;
+				sty_ButtonF25.active.background=t2d_f25_off_d;
+				sty_ButtonF25.normal.background=t2d_f25_off_u;
+				sty_ButtonF50.active.background=t2d_f50_off_d;
+				sty_ButtonF50.normal.background=t2d_f50_off_u;
+				break;
+			}
+		
+		}
+		else
+		{
+			sty_ButtonF0.active.background=t2d_f0_off_d;
+			sty_ButtonF0.normal.background=t2d_f0_off_u; 
+			sty_ButtonF25.active.background=t2d_f25_off_d;
+			sty_ButtonF25.normal.background=t2d_f25_off_u;
+			sty_ButtonF50.active.background=t2d_f50_off_d;
+			sty_ButtonF50.normal.background=t2d_f50_off_u;
+			sty_ButtonF100.active.background=t2d_f100_off_d;
+			sty_ButtonF100.normal.background=t2d_f100_off_u;
 		}
 	}
 	
@@ -1156,46 +1254,7 @@ public class ControlPanel : MonoBehaviour {
 				if(RapidMoveFlag)
 				{
 					RapidMoveFlag = false;
-					switch(SlowSpeedMode)//内容--慢常速模式对应相应的按钮状态，姓名--刘旋，时间--2013-4-9
-					{
-					case 0://慢常速模式为0，对应F0状态为真
-						F0_flag=true;
-						sty_ButtonF0.normal.background=t2d_f0_on_u;
-					    sty_ButtonF0.active.background=t2d_f0_on_d;
-						break;
-					case 1://慢常速模式为1，对应F25状态为真
-						F25_flag=true;
-						sty_ButtonF25.normal.background=t2d_f25_on_u;
-					    sty_ButtonF25.active.background=t2d_f25_on_d;
-						break;
-					case 2://慢常速模式为2，对应F50状态为真
-						F50_flag=true;
-						sty_ButtonF50.normal.background=t2d_f50_on_u;
-					    sty_ButtonF50.active.background=t2d_f50_on_d;
-						break;
-					case 3://慢常速模式为3，对应F100状态为真
-						F100_flag=true;
-						sty_ButtonF100.normal.background=t2d_f100_on_u;
-					    sty_ButtonF100.active.background=t2d_f100_on_d;
-						break;
-					}//增加内容到此  2013-4-9
 					MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-					switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
-							{
-						    case 0://模式0（即;F0状态）
-									MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
-								    break;
-							case 1://模式0（即;F25状态）
-								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
-								    break;
-							case 2://模式0（即;F50状态）
-									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
-								    break;
-							case 3://模式0（即;F100状态）
-								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
-								    break;	
-									
-							}//增加内容到此  2013-4-9
 					MoveControl_script.move_rate = move_rate;
 					sty_ButtonRapid.normal.background = t2d_rapid_off_u;
 					sty_ButtonRapid.active.background = t2d_rapid_off_d;
@@ -1203,20 +1262,8 @@ public class ControlPanel : MonoBehaviour {
 				else
 				{
 					RapidMoveFlag = true;
-					F0_flag=false;//内容--快速模式下，四个状态（F0,F25,F50,F100）都为假，姓名--刘旋，时间--2013-4-9
-					F25_flag=false;
-					F50_flag=false;
-					F100_flag=false;
-					sty_ButtonF0.normal.background=t2d_f0_off_u;
-					sty_ButtonF0.active.background=t2d_f0_off_d;
-					sty_ButtonF25.normal.background=t2d_f25_off_u;
-					sty_ButtonF25.active.background=t2d_f25_off_d;
-					sty_ButtonF50.normal.background=t2d_f50_off_u;
-					sty_ButtonF50.active.background=t2d_f50_off_d;
-					sty_ButtonF100.normal.background=t2d_f100_off_u;
-					sty_ButtonF100.active.background=t2d_f100_off_d;//增加内容到此  2013-4-9
 					MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-					MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
+					MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
 					sty_ButtonRapid.normal.background = t2d_rapid_on_u;
 					sty_ButtonRapid.active.background = t2d_rapid_on_d;
 				}
@@ -1261,30 +1308,28 @@ public class ControlPanel : MonoBehaviour {
 					if(RapidMoveFlag)
 					{
 						MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-						MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-						RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
-					}
-					else
-					{
-						MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-						switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
+						MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，恒为1，姓名--刘旋，时间--2013-4-11
+						switch(RapidSpeedMode)//内容--快常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
 							{
 						    case 0://模式0（即;F0状态）
 									MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
 								    break;
 							case 1://模式0（即;F25状态）
-								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
+								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为快常速的25%
 								    break;
 							case 2://模式0（即;F50状态）
-									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
+									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为快常速的50%
 								    break;
 							case 3://模式0（即;F100状态）
-								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
+								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于快常速
 								    break;	
 									
 							}//增加内容到此  2013-4-9
+					}
+					else
+					{
+						MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8				
 						MoveControl_script.move_rate = move_rate;
-						RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
 					}
 					if(MoveControl_script.Y_part.position.x - MoveControl_script.MachineZero.x >= 0.5f)
 						MoveControl_script.y_n = false;
@@ -1309,30 +1354,28 @@ public class ControlPanel : MonoBehaviour {
 					if(RapidMoveFlag)
 					{
 						MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-						MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-						RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
-					}
-					else
-					{
-						MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-						switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
+						MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，恒为1，姓名--刘旋，时间--2013-4-11
+						switch(RapidSpeedMode)//内容--快常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
 							{
 						    case 0://模式0（即;F0状态）
 									MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
 								    break;
 							case 1://模式0（即;F25状态）
-								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
+								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为快常速的25%
 								    break;
 							case 2://模式0（即;F50状态）
-									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
+									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为快常速的50%
 								    break;
 							case 3://模式0（即;F100状态）
-								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
+								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于快常速
 								    break;	
 									
 							}//增加内容到此  2013-4-9
+					}
+					else
+					{
+						MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
 						MoveControl_script.move_rate = move_rate;
-						RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
 					}
 					if(MoveControl_script.MachineZero.z - MoveControl_script.X_part.position.z >= 0.8f)
 						MoveControl_script.x_n = false;
@@ -1357,30 +1400,28 @@ public class ControlPanel : MonoBehaviour {
 					if(RapidMoveFlag)
 					{
 						MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-						MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-						RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
-					}
-					else
-					{
-						MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-						switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
+						MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，恒为1，姓名--刘旋，时间--2013-4-11
+						switch(RapidSpeedMode)//内容--快常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
 							{
 						    case 0://模式0（即;F0状态）
 									MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
 								    break;
 							case 1://模式0（即;F25状态）
-								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
+								    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为快常速的25%
 								    break;
 							case 2://模式0（即;F50状态）
-									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
+									MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为快常速的50%
 								    break;
 							case 3://模式0（即;F100状态）
-								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
+								    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于快常速
 								    break;	
 									
 							}//增加内容到此  2013-4-9
+					}
+					else
+					{
+						MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
 						MoveControl_script.move_rate = move_rate;
-						RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
 					}
 					if(MoveControl_script.MachineZero.y - MoveControl_script.Z_part.position.y >= 0.51f)
 						MoveControl_script.z_n = false;
@@ -1402,9 +1443,8 @@ public class ControlPanel : MonoBehaviour {
 			{
 				if(ScreenPower)
 				{
-					MoveControl_script.move_rate = move_rate;//内容--归零模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-					MoveControl_script.speed_to_move = 0.08333F;//内容--归零操作的实际速度为5m/min=(5/60)m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为5/60,姓名--刘旋，时间--2013-4-8
-					RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
+					MoveControl_script.move_rate = 1f;//内容--归零模式下，实际进给速率倍率的修改，恒为1,姓名--刘旋，时间--2013-4-11
+					MoveControl_script.speed_to_move = 0.6F;//内容--归零操作的实际速度为36m/min=0.6m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为0.6,姓名--刘旋，时间--2013-4-8
 					MoveControl_script.z_p = true;
 				}
 				else
@@ -1415,9 +1455,8 @@ public class ControlPanel : MonoBehaviour {
 			{
 				if(ScreenPower)
 				{
-					MoveControl_script.move_rate = move_rate;//内容--归零模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-					MoveControl_script.speed_to_move = 0.08333F;//内容--归零操作的实际速度为5m/min=(5/60)m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为5/60,姓名--刘旋，时间--2013-4-8
-					RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
+					MoveControl_script.move_rate = 1f;//内容--归零模式下，实际进给速率倍率的修改，恒为1,姓名--刘旋，时间--2013-4-11
+					MoveControl_script.speed_to_move = 0.6F;//内容--归零操作的实际速度为36m/min=0.6m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为0.6,姓名--刘旋，时间--2013-4-8
 					MoveControl_script.x_p = true;
 				}
 				else
@@ -1428,9 +1467,8 @@ public class ControlPanel : MonoBehaviour {
 			{
 				if(ScreenPower)
 				{
-					MoveControl_script.move_rate = move_rate;//内容--归零模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-					MoveControl_script.speed_to_move = 0.08333F;//内容--归零操作的实际速度为5m/min=(5/60)m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为5/60,姓名--刘旋，时间--2013-4-8
-					RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
+					MoveControl_script.move_rate = 1f;//内容--归零模式下，实际进给速率倍率的修改，恒为1,姓名--刘旋，时间--2013-4-11
+					MoveControl_script.speed_to_move = 0.6F;//内容--归零操作的实际速度为36m/min=0.6m/s，而实际速度RunningSpeed=speed—to-move*move-rate，因此speed-to-move应设为0.6,姓名--刘旋，时间--2013-4-8
 					MoveControl_script.y_p = true;
 				}
 				else
@@ -1448,30 +1486,28 @@ public class ControlPanel : MonoBehaviour {
 						if(RapidMoveFlag)
 						{
 							MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-							MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-							RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
-						}
-						else
-						{
-							MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-							switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
+							MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，恒为1，姓名--刘旋，时间--2013-4-11
+							switch(RapidSpeedMode)//内容--快常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
 								{
 							    case 0://模式0（即;F0状态）
 										MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
 									    break;
 								case 1://模式0（即;F25状态）
-									    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
+									    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为快常速的25%
 									    break;
 								case 2://模式0（即;F50状态）
-										MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
+										MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为快常速的50%
 									    break;
 								case 3://模式0（即;F100状态）
-									    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
+									    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于快常速
 									    break;	
 										
 								}//增加内容到此  2013-4-9
+						}
+						else
+						{
+							MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
 							MoveControl_script.move_rate = move_rate;
-							RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
 						}
 						if(MoveControl_script.MachineZero.y - MoveControl_script.Z_part.position.y <= 0)
 							MoveControl_script.z_p = false;
@@ -1496,35 +1532,39 @@ public class ControlPanel : MonoBehaviour {
 						if(RapidMoveFlag)
 						{
 							MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-							MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-							RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
-						}
-						else
-						{
-							MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-							switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
+							MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，恒为1，姓名--刘旋，时间--2013-4-11
+							switch(RapidSpeedMode)//内容--快常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
 								{
 							    case 0://模式0（即;F0状态）
 										MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
 									    break;
 								case 1://模式0（即;F25状态）
-									    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
+									    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为快常速的25%
 									    break;
 								case 2://模式0（即;F50状态）
-										MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
+										MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为快常速的50%
 									    break;
 								case 3://模式0（即;F100状态）
-									    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
+									    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于快常速
 									    break;	
 										
 								}//增加内容到此  2013-4-9
+						}
+						else
+						{
+							MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
 							MoveControl_script.move_rate = move_rate;
-							RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
 						}
 						if(MoveControl_script.MachineZero.z - MoveControl_script.X_part.position.z <= 0)
+						{
 							MoveControl_script.x_p = false;
+							//MoveControl_script.move_flag=false;
+						}
 						else
+						{
 						   MoveControl_script.x_p = true;
+							//MoveControl_script.move_flag=true;
+						}
 					}
 				}
 				else
@@ -1544,30 +1584,28 @@ public class ControlPanel : MonoBehaviour {
 						if(RapidMoveFlag)
 						{
 							MoveControl_script.speed_to_move = 0.6F;//内容--JOG模式下，快常速为36m/min=(36/60)m/s,因此spee-to-move=36/60,姓名--刘旋，时间--2013-4-8
-							MoveControl_script.move_rate = move_rate;//内容--JOG模式下，实际进给速率倍率的修改，不恒为1，与进给面板数值保持一致，姓名--刘旋，时间--2013-4-8
-							RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
-						}
-						else
-						{
-							MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8
-							switch(SlowSpeedMode)//内容--慢常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
+							MoveControl_script.move_rate = 1f;//内容--JOG模式下，实际进给速率倍率的修改，恒为1，姓名--刘旋，时间--2013-4-11
+							switch(RapidSpeedMode)//内容--快常速四种状态作用于实际速度，姓名--刘旋，时间--2013-4-9
 								{
 							    case 0://模式0（即;F0状态）
 										MoveControl_script.speed_to_move=0*MoveControl_script.speed_to_move;//F0模式下，为停止，即：实际速度为0
 									    break;
 								case 1://模式0（即;F25状态）
-									    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为慢常速的25%
+									    MoveControl_script.speed_to_move=0.25f*MoveControl_script.speed_to_move;//F25模式下，实际速度为快常速的25%
 									    break;
 								case 2://模式0（即;F50状态）
-										MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为慢常速的50%
+										MoveControl_script.speed_to_move=0.5f*MoveControl_script.speed_to_move;//F50模式下，实际速度为快常速的50%
 									    break;
 								case 3://模式0（即;F100状态）
-									    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于慢常速
+									    MoveControl_script.speed_to_move=1f*MoveControl_script.speed_to_move;//F100模式下，实际速度等于快常速
 									    break;	
 										
 								}//增加内容到此  2013-4-9
+						}
+						else
+						{
+							MoveControl_script.speed_to_move = 0.16667F;//内容--JOG模式下，慢常速为10m/min=(10/60)m/s,因此spee-to-move=10/60,姓名--刘旋，时间--2013-4-8						
 							MoveControl_script.move_rate = move_rate;
-							RunningSpeed=Convert.ToInt32(MoveControl_script.speed_to_move*MoveControl_script.move_rate*1000*60);//内容--为RunningSpeed赋值，速度单位换算1m/s=1000*60mm/min,姓名--刘旋，时间--2013-4-8
 						}
 						if(MoveControl_script.Y_part.position.x - MoveControl_script.MachineZero.x <= 0)
 							MoveControl_script.y_p = false;
@@ -1595,38 +1633,29 @@ public class ControlPanel : MonoBehaviour {
 			{
 				if(ProgJOG)//内容--JOG模式下，实现F0按钮的功能，姓名--刘旋，时间--2013-4-9
 				{
-					if(RapidMoveFlag)//内容，在快速模式下，四个状态（F0，25%，50%，100%）都设为假，姓名--刘旋，时间--2013-4-9
+					if(RapidMoveFlag)//内容，在快速模式下，F0的功能，姓名--刘旋，时间--2013-4-11
 					{
-						F0_flag=false;
-						sty_ButtonF0.normal.background=t2d_f0_off_u;
-						sty_ButtonF0.active.background=t2d_f0_off_d;
+						F0_flag=true;
+						F25_flag=false;
+						F50_flag=false;
+						F100_flag=false;
+						sty_ButtonF0.active.background=t2d_f0_on_d;
+						sty_ButtonF0.normal.background=t2d_f0_on_u; 
+						sty_ButtonF25.active.background=t2d_f25_off_d;
+						sty_ButtonF25.normal.background=t2d_f25_off_u;
+						sty_ButtonF50.active.background=t2d_f50_off_d;
+						sty_ButtonF50.normal.background=t2d_f50_off_u;
+						sty_ButtonF100.active.background=t2d_f100_off_d;
+						sty_ButtonF100.normal.background=t2d_f100_off_u;
+						RapidSpeedMode=0;//快常速模式状态为0
+						PlayerPrefs.SetInt("F_SpeedMode", 0);    
+					
 					}
 					else//内容--慢速模式下，F0按钮的功能。姓名--刘旋，时间--2013-4-9
 					{
-					if(F0_flag)//内容--若F0按钮已经按下，再次按下F0按钮，F0状态为假，此时四个状态（F0，25%，50%，100%）都为假，在这种情况下，可以选择将状态无条件的转为50%模式，姓名--刘旋，时间--2013-4-9
-					{
-						F0_flag=false;//F0为假
-						F50_flag=true;//F50为真
-						sty_ButtonF0.normal.background=t2d_f0_off_u;
-						sty_ButtonF0.active.background=t2d_f0_off_d;
-						sty_ButtonF50.normal.background=t2d_f50_on_u;
-						SlowSpeedMode=2;//慢常速模式状态为2
-					}
-					else//内容--若F0状态为假，按下F0键时，模式切换为F0状态，同时其它三个状态为假，姓名--刘旋，时间--2013-4-9
-					{
-						SlowSpeedMode=0;//慢常速模式状态为0
-						F0_flag=true;//F0为真
-						F25_flag=false;//其它三个状态为假
-						F50_flag=false;
-						F100_flag=false;
-						sty_ButtonF25.normal.background=t2d_f25_off_u;
-						sty_ButtonF50.normal.background=t2d_f50_off_u;
-						sty_ButtonF100.normal.background=t2d_f100_off_u;
-						sty_ButtonF0.normal.background=t2d_f0_on_u;
-						sty_ButtonF0.active.background=t2d_f0_on_d;
-					}
-				}
-				}//增加内容到此  2013-4-9
+						
+				    }
+			    }//增加内容到此  2013-4-9
 			}
 		}
 		
@@ -1636,38 +1665,29 @@ public class ControlPanel : MonoBehaviour {
 			{
 				if(ProgJOG)//内容--JOG模式下，实现F25按钮的功能，姓名--刘旋，时间--2013-4-9
 				{
-					if(RapidMoveFlag)//内容，在快速模式下，四个状态（F0，25%，50%，100%）都设为假，姓名--刘旋，时间--2013-4-9
+					if(RapidMoveFlag)//内容，在快速模式下，F25的功能，姓名--刘旋，时间--2013-4-11
 					{
-						F25_flag=false;
-						sty_ButtonF25.normal.background=t2d_f25_off_u;
-						sty_ButtonF25.active.background=t2d_f25_off_d;
-					}
-					else//内容--慢速模式下，F0按钮的功能。姓名--刘旋，时间--2013-4-9
-					{
-					if(F25_flag)//内容--若F25按钮已经按下，再次按下F25按钮，F25状态为假，此时四个状态（F0，25%，50%，100%）都为假，在这种情况下，可以选择将状态无条件的转为50%模式，姓名--刘旋，时间--2013-4-9
-					{
-						F25_flag=false;//F0为假
-						F50_flag=true;//F50为真
-						sty_ButtonF25.normal.background=t2d_f25_off_u;
-						sty_ButtonF25.active.background=t2d_f25_off_d;
-						sty_ButtonF50.normal.background=t2d_f50_on_u;
-						SlowSpeedMode=2;//慢常速模式状态为2
-					}
-					else//内容--若F25状态为假，按下F0键时，模式切换为F25状态，同时其它三个状态为假，姓名--刘旋，时间--2013-4-9
-					{
-						SlowSpeedMode=1;//慢常速模式状态为1
 						F0_flag=false;
-						F25_flag=true;
+					    F25_flag=true;
 						F50_flag=false;
 						F100_flag=false;
-						sty_ButtonF0.normal.background=t2d_f0_off_u;
-						sty_ButtonF50.normal.background=t2d_f50_off_u;
-						sty_ButtonF100.normal.background=t2d_f100_off_u;
-						sty_ButtonF25.normal.background=t2d_f25_on_u;
 						sty_ButtonF25.active.background=t2d_f25_on_d;
+						sty_ButtonF25.normal.background=t2d_f25_on_u;						    
+						sty_ButtonF0.active.background=t2d_f0_off_d;
+						sty_ButtonF0.normal.background=t2d_f0_off_u;
+						sty_ButtonF50.active.background=t2d_f50_off_d;
+						sty_ButtonF50.normal.background=t2d_f50_off_u;
+						sty_ButtonF100.active.background=t2d_f100_off_d;
+						sty_ButtonF100.normal.background=t2d_f100_off_u;
+						RapidSpeedMode=1;//快常速模式状态为1
+						PlayerPrefs.SetInt("F_SpeedMode", 1);
+					
 					}
-					}
-				}//增加内容到此  2013-4-9
+					else//内容--慢速模式下，F25按钮的功能。姓名--刘旋，时间--2013-4-9
+					{
+						
+				    }
+			    }//增加内容到此  2013-4-9
 			}
 		}
 		
@@ -1676,27 +1696,30 @@ public class ControlPanel : MonoBehaviour {
 			if(ScreenPower)
 			{
 				if(ProgJOG)//内容--JOG模式下，实现F50按钮的功能，姓名--刘旋，时间--2013-4-9
-				{ 
-					if(RapidMoveFlag)//内容，在快速模式下，四个状态（F0，25%，50%，100%）都设为假，姓名--刘旋，时间--2013-4-9
+				{
+					if(RapidMoveFlag)//内容，在快速模式下，F50的功能，姓名--刘旋，时间--2013-4-11
 					{
-						F50_flag=false;
-						sty_ButtonF50.normal.background=t2d_f50_off_u;
-						sty_ButtonF50.active.background=t2d_f50_off_d;
-					}
-					else//内容--慢速模式下，F0按钮的功能。姓名--刘旋，时间--2013-4-9
-					{  //内容--若F50为假，按下F50键时，F50应为真，若F50为真，按下F50键时，为了避免四种状态都为假，此时切换为F50为真，因此不论F50的状态怎样，当按下F50时，F50都为真，姓名--刘旋，时间--2013-4-9
-						SlowSpeedMode=2;//慢常速模式状态为2
 						F0_flag=false;
 						F25_flag=false;
 						F50_flag=true;
 						F100_flag=false;
-						sty_ButtonF0.normal.background=t2d_f0_off_u;
-						sty_ButtonF25.normal.background=t2d_f25_off_u;
-						sty_ButtonF100.normal.background=t2d_f100_off_u;
-						sty_ButtonF50.normal.background=t2d_f50_on_u;
 						sty_ButtonF50.active.background=t2d_f50_on_d;
-					}  
-				}//增加内容到此  2013-4-9
+						sty_ButtonF50.normal.background=t2d_f50_on_u;
+						sty_ButtonF0.active.background=t2d_f0_off_d;
+						sty_ButtonF0.normal.background=t2d_f0_off_u;
+						sty_ButtonF25.active.background=t2d_f25_off_d;
+						sty_ButtonF25.normal.background=t2d_f25_off_u;
+						sty_ButtonF100.active.background=t2d_f100_off_d;
+						sty_ButtonF100.normal.background=t2d_f100_off_u;
+						RapidSpeedMode=2;//快常速模式状态为2
+						PlayerPrefs.SetInt("F_SpeedMode", 2);
+				
+						
+					}
+					else//内容--慢速模式下，F50按钮的功能。姓名--刘旋，时间--2013-4-9
+					{
+				    }
+			    }//增加内容到此  2013-4-9
 			}
 		}
 		
@@ -1706,38 +1729,28 @@ public class ControlPanel : MonoBehaviour {
 			{
 				if(ProgJOG)//内容--JOG模式下，实现F100按钮的功能，姓名--刘旋，时间--2013-4-9
 				{
-					if(RapidMoveFlag)//内容，在快速模式下，四个状态（F0，25%，50%，100%）都设为假，姓名--刘旋，时间--2013-4-9
+					if(RapidMoveFlag)//内容，在快速模式下，F100的功能，姓名--刘旋，时间--2013-4-11
 					{
-						F100_flag=false;
-						sty_ButtonF100.normal.background=t2d_f100_off_u;
-						sty_ButtonF100.active.background=t2d_f100_off_d;
-					}
-					else//内容--慢速模式下，F0按钮的功能。姓名--刘旋，时间--2013-4-9
-					{
-					if(F100_flag)//内容--若F100按钮已经按下，再次按下F100按钮，F100状态为假，此时四个状态（F0，25%，50%，100%）都为假，在这种情况下，可以选择将状态无条件的转为50%模式，姓名--刘旋，时间--2013-4-9
-					{
-						F100_flag=false;
-						F50_flag=true;
-						sty_ButtonF100.normal.background=t2d_f100_off_u;
-						sty_ButtonF100.active.background=t2d_f100_off_d;
-						sty_ButtonF50.normal.background=t2d_f50_on_u;
-						SlowSpeedMode=2;//慢常速模式状态为2
-					}
-					else//内容--若F100状态为假，按下F100键时，模式切换为F100状态，同时其它三个状态为假，姓名--刘旋，时间--2013-4-9
-					{
-						SlowSpeedMode=3;//慢常速模式状态为3
 						F0_flag=false;
 						F25_flag=false;
 						F50_flag=false;
 						F100_flag=true;
-						sty_ButtonF0.normal.background=t2d_f0_off_u;
-						sty_ButtonF25.normal.background=t2d_f25_off_u;
-						sty_ButtonF50.normal.background=t2d_f50_off_u;
-						sty_ButtonF100.normal.background=t2d_f100_on_u;
 						sty_ButtonF100.active.background=t2d_f100_on_d;
+						sty_ButtonF100.normal.background=t2d_f100_on_u;						    
+						sty_ButtonF0.active.background=t2d_f0_off_d;
+						sty_ButtonF0.normal.background=t2d_f0_off_u;
+						sty_ButtonF25.active.background=t2d_f25_off_d;
+						sty_ButtonF25.normal.background=t2d_f25_off_u;
+						sty_ButtonF50.active.background=t2d_f50_off_d;
+						sty_ButtonF50.normal.background=t2d_f50_off_u;	
+						RapidSpeedMode=3;//快常速模式状态为3
+						PlayerPrefs.SetInt("F_SpeedMode", 3);
+						
 					}
-					}
-				}//增加内容到此  2013-4-9
+					else//内容--慢速模式下，F100按钮的功能。姓名--刘旋，时间--2013-4-9
+					{
+				    }
+			    }//增加内容到此  2013-4-9
 			}
 		}
 		
@@ -2161,6 +2174,6 @@ public class ControlPanel : MonoBehaviour {
 		}	
 		return AimCode.TrimEnd();
 	}
-
+	
 	
 }
