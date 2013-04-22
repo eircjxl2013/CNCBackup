@@ -119,7 +119,7 @@ public class NCCodeFormat : MonoBehaviour {
 	
 	
 	/// <summary>
-	/// 获取一个完成NC文件的的NC代码，并进行格式化
+	/// 获取一个完整NC文件的的NC代码，并进行格式化
 	/// --1--先通过调用CodeLoad函数获取相应路径下的NC文件中的内容
 	/// --2--将每条代码都进行格式化
 	/// </summary>
@@ -129,7 +129,7 @@ public class NCCodeFormat : MonoBehaviour {
 	/// <param name='file_name'>
 	/// NC 程序的程序名，O0010可以简写为O10
 	/// </param>
-	List<List<string>> AllCode (string file_name) 
+	public List<List<string>> AllCode (string file_name) 
 	{
 		//Initialize the return value. 
 		List<List<string>> all_code_list = new List<List<string>>();
@@ -163,7 +163,7 @@ public class NCCodeFormat : MonoBehaviour {
 	/// <param name='sourceCode'>
 	/// 传入的NC程序段,类型为string.
 	/// </param>
-	List<string> CodeFormat(string sourceCode)
+	public List<string> CodeFormat(string sourceCode)
 	{
 		//Initialize code segment data struct
 		List<string> code_segment = new List<string>();
@@ -204,7 +204,7 @@ public class NCCodeFormat : MonoBehaviour {
 				//--4-- #40 == (#\d+)
 				//--5-- #[#40] == (#\[[^\[\]]*(((?'Open'\[)[^\[\]]*)+((?'-Open'\])[^\[\]]*)+)*(?(Open)(?!))\])
 				//--6-- =\S+$ == (=\S+$) 即等号后面都当做一个字符数来处理
-				string pattern_macro = @"([A-Z]+[^A-Z^\s^#^=^\[^\]]+)|([A-Z]+#\d+)|([A-Z]+\[[^\[\]]*(((?'Open'\[)[^\[\]]*)+((?'-Open'\])[^\[\]]*)+)*(?(Open)(?!))\])|(#\d+)|(#\[[^\[\]]*(((?'Open'\[)[^\[\]]*)+((?'-Open'\])[^\[\]]*)+)*(?(Open)(?!))\])|(=\S+$)";
+				string pattern_macro = @"([A-Z]+[^A-Z^\s^#^=^\[^\]]+)|([A-Z]+#\d+)|([A-Z]+\[[^\[\]]*(((?'Open'\[)[^\[\]]*)+((?'-Open'\])[^\[\]]*)+)*(?(Open)(?!))\])|(#\d+)|(#\[[^\[\]]*(((?'Open'\[)[^\[\]]*)+((?'-Open'\])[^\[\]]*)+)*(?(Open)(?!))\])|(=\S+$)|(/\d?)";
 				Regex macro_test_Reg = new Regex(pattern_macro);
 				MatchCollection macro_test_Col = macro_test_Reg.Matches(sourceCode);
 				if(macro_test_Col.Count > 0)
@@ -242,7 +242,7 @@ public class NCCodeFormat : MonoBehaviour {
 			else
 			{//3 level
 				//It doesn't contain macroprogram
-				Regex format_normal_Reg = new Regex(@"([A-Z]+[^A-Z^\s]+)+", RegexOptions.IgnoreCase);
+				Regex format_normal_Reg = new Regex(@"(([A-Z]+[^A-Z^\s]+)+)|(/\d?)", RegexOptions.IgnoreCase);
 				Match format_normal_Mat = format_normal_Reg.Match(sourceCode);
 				if(format_normal_Mat.Groups.Count > 1)
 				{
@@ -289,7 +289,7 @@ public class NCCodeFormat : MonoBehaviour {
 	/// <param name='filename'>
 	/// NC程序的程序名
 	/// </param>
-	List<string> CodeLoad (string filename)
+	public List<string> CodeLoad (string filename)
 	{
 		List<string> original_code = new List<string>();
 		bool success_open = true;
@@ -369,7 +369,7 @@ public class NCCodeFormat : MonoBehaviour {
 	/// <returns>
 	/// 文件名字列表，返回类型：List<string>
 	/// </returns>
-	List<string> NCFileList ( )
+	public List<string> NCFileList ( )
 	{
 		List<string> file_name_list = new List<string>();
 		//Judge whether the file directory is right or not
