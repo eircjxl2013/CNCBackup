@@ -19,6 +19,8 @@ public class ShowOuterSkin : MonoBehaviour {
 				foreach(Transform child in outer_skin)
 				{
 					child.renderer.enabled = false;
+					foreach(Transform grandson in child)
+						grandson.renderer.enabled = false;
 				}
 			}
 			else
@@ -27,6 +29,8 @@ public class ShowOuterSkin : MonoBehaviour {
 				foreach(Transform child in outer_skin)
 				{
 					child.renderer.enabled = true;
+					foreach(Transform grandson in child)
+						grandson.renderer.enabled = true;
 				}
 			}
 		}

@@ -191,7 +191,7 @@ public class NCCodeFormat : MonoBehaviour {
 		if(sourceCode != "")
 		{//1 level
 			//To judge whether it is macroprogram or not.
-			Regex macro_Reg = new Regex(@"((#+)|(\[+)|(\]+)|(=+))", RegexOptions.IgnoreCase);
+			Regex macro_Reg = new Regex(@"((#+)|(\[+)|(\]+)|(=+)|(/))", RegexOptions.IgnoreCase);
 			MatchCollection macro_Col = macro_Reg.Matches(sourceCode);
 			if(macro_Col.Count > 0)
 			{//2 level
@@ -242,7 +242,7 @@ public class NCCodeFormat : MonoBehaviour {
 			else
 			{//3 level
 				//It doesn't contain macroprogram
-				Regex format_normal_Reg = new Regex(@"(([A-Z]+[^A-Z^\s]+)+)|(/\d?)", RegexOptions.IgnoreCase);
+				Regex format_normal_Reg = new Regex(@"([A-Z]+[^A-Z^\s]+)+", RegexOptions.IgnoreCase);
 				Match format_normal_Mat = format_normal_Reg.Match(sourceCode);
 				if(format_normal_Mat.Groups.Count > 1)
 				{

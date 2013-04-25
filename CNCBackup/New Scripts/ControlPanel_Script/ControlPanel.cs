@@ -23,6 +23,8 @@ public class ControlPanel : MonoBehaviour {
 	CooSystem CooSystem_script;
 	CompileNC CompileNC_script;
 	AuxiliaryMoveModule AuxiliaryMove_Script;
+	SystemModule System_Script;//添加脚本SystemModule和MessageModule，姓名--刘旋，时间--2013-4-24
+	MessageModule Message_Script;
 	#endregion
 	
 	#region Defined variable
@@ -38,7 +40,7 @@ public class ControlPanel : MonoBehaviour {
 	//内容--定义整形变量SlowSpeedMode，用于指示慢常速下的按键状态，SlowSpeedMode=0，表示F0按下，SlowSpeedMode=1，表示25%按下
 	//SlowSpeedMode=2，表示50%按下，SlowSpeedMode=3，表示100%按下，姓名--刘旋，时间--2013-4-8
 	public int RapidSpeedMode=2;//增加内容到此  2013-4-8
-	Rect PanelWindowRect = new Rect(0, 0, 670, 650);   
+	public Rect PanelWindowRect = new Rect(-300, 20, 670, 650);   
 	public float timeV = 0;
 	
 	public Texture2D t2d_alarm;
@@ -157,6 +159,7 @@ public class ControlPanel : MonoBehaviour {
 	//内容--定义sty-Mode，用于显示模态
 	//姓名--刘旋，时间--2013-3-29
 	public GUIStyle sty_Mode;
+	public GUIStyle sty_ModeCode;
 	
 	//button按钮style
 	public GUIStyle sty_NCPowerOn;
@@ -218,6 +221,18 @@ public class ControlPanel : MonoBehaviour {
 	
 	public GUIStyle sty_EditListTop;
 	
+	//内容--定义Message界面字体
+	public GUIStyle sty_MessAlarm;
+	public GUIStyle sty_MessRecordID;
+	public GUIStyle sty_MessRecordTime;
+	public GUIStyle sty_MessRecordInfo;
+	//内容--定义System界面字体
+	public GUIStyle sty_SysID;
+	public GUIStyle sty_SysInfo;
+	
+	//内容--定义布尔变量，控制System、Message的显示，姓名--刘旋，时间--2013-4-24
+	public bool SystemMenu=false;
+	public bool MessageMenu=false;
 	public bool PosMenu = true;
 	public bool RelativeCoo = false;
 	public bool AbsoluteCoo = true;
@@ -256,7 +271,16 @@ public class ControlPanel : MonoBehaviour {
 	public int ProgUsedSpace = 0;
 	//内容--内存总容量为512K，姓名--刘旋，时间--2013-3-18
 	public int ProgUnusedSpace = 512;//将419430400修改为512
-	
+	//内容--定义变量ProgMDIFlip，用于控制MDI模式下，程序菜单屏幕的显示，姓名--刘旋，时间--2013-4-22
+	public int ProgMDIFlip=0;
+	//内容--定义变量ProgDNCFlip，用于控制DNC模式下，程序菜单屏幕的显示，姓名--刘旋，时间--2013-4-22
+	public int ProgDNCFlip=0;
+	//内容--定义变量ProgHANFlip，用于控制Handle模式下，程序菜单屏幕的显示，姓名--刘旋，时间--2013-4-22
+	public int ProgHANFlip=0;
+	//内容--定义变量MessageFlip，用于Message模式的显示，姓名--刘旋，时间--2013-4-24
+	public int MessageFlip=0;
+	//内容--定义变量SystemFlip，用于System模式的显示，姓名--刘旋，时间--2013-4-24
+	public int SystemFlip=0;
 	public float ProgEDITCusor = 0;
 	public float ProgEDITCusorV = 0;
 	public float ProgEDITCusorH = 0;
@@ -279,8 +303,6 @@ public class ControlPanel : MonoBehaviour {
 	public bool OffSetOne = true;
 	public bool OffSetTwo = false;
 	public bool OffCooFirstPage = true;
-	
-	
 	
 	public List<string> FileNameList = new List<string>();
 	public List<int> FileSizeList = new List<int>();
@@ -370,13 +392,19 @@ public class ControlPanel : MonoBehaviour {
 	public float tool_setting_cursor_y = 81.5f; //刀偏界面光标水平方向的值
 	public float tool_setting_cursor_w = 91.5f; //刀偏界面光标垂直方向的值
 	//刀偏界面完善---张振华---03.30
-
+	
+	float left = -300f;
+	bool show_off = false;
 	#endregion
 	
 	void Awake () 
 	{
 		gameObject.AddComponent("PositionModule");
 		Position_Script = gameObject.GetComponent<PositionModule>();
+		gameObject.AddComponent("SystemModule");//添加脚本，姓名--刘旋，时间--2013-4-24
+		System_Script=gameObject.GetComponent<SystemModule>();
+		gameObject.AddComponent("MessageModule");
+		Message_Script=gameObject.GetComponent<MessageModule>();
 		gameObject.AddComponent("SoftkeyModule");
 		Softkey_Script = gameObject.GetComponent<SoftkeyModule>();
 		gameObject.AddComponent("ProgramModule");
@@ -758,9 +786,12 @@ public class ControlPanel : MonoBehaviour {
 		sty_Code.fontSize = 17;
 		sty_Code.fontStyle = FontStyle.Bold;
 		
+		sty_ModeCode.fontSize=15;
+		sty_ModeCode.fontStyle=FontStyle.Bold;
+		
 		//内容--sty-Mode赋值为蓝色
 		//姓名--刘旋，时间--2013-3-29
-		sty_Mode.fontSize=17;
+		sty_Mode.fontSize=15;
 		sty_Mode.fontStyle=FontStyle.Bold;
 		sty_Mode.normal.textColor=Color.blue;
 		
@@ -776,6 +807,27 @@ public class ControlPanel : MonoBehaviour {
 		sty_ScreenBackGround.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/ScreenBackground");
 		
 		sty_TopLabel.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/toplabel");
+		
+		sty_MessAlarm.font=(Font)Resources.Load("font/simfang");
+		sty_MessAlarm.normal.textColor=Color.red;
+		sty_MessAlarm.fontSize=13;
+		
+		sty_MessRecordID.font=(Font)Resources.Load("font/simfang");
+		sty_MessRecordID.normal.textColor=Color.blue;
+		sty_MessRecordID.fontSize=13;
+		
+		sty_MessRecordTime.font=(Font)Resources.Load("font/simfang");
+		sty_MessRecordTime.fontSize=14;
+		
+		sty_MessRecordInfo.font=(Font)Resources.Load("font/simfang");
+		sty_MessRecordInfo.fontSize=15;
+		
+		sty_SysID.font=(Font)Resources.Load("font/monoMMM_5");
+		sty_SysID.fontSize=13;
+		
+		sty_SysInfo.font=(Font)Resources.Load("font/simfang");
+		sty_SysInfo.fontSize=15;
+		sty_SysInfo.normal.textColor=Color.blue;
 		
 		t2d_BottomButton_u = (Texture2D)Resources.Load("Texture_Panel/Button/bottombutton_u");
 		t2d_BottomButton_d = (Texture2D)Resources.Load("Texture_Panel/Button/bottombutton_d");
@@ -816,7 +868,8 @@ public class ControlPanel : MonoBehaviour {
 		sty_OffSet_Coo.normal.background = (Texture2D)Resources.Load("Texture_Panel/Label/offset_coo");
 		width = 670F;
 		height = 650F;
-		PanelWindowRect = new Rect(0,0,width,height);
+		left = -700f;
+		PanelWindowRect = new Rect(left, 30f, width, height);
 		EDITText.enabled = false;
 		EDITText.font = sty_Code.font;
 		EDITText.fontSize = sty_Code.fontSize;
@@ -858,6 +911,12 @@ public class ControlPanel : MonoBehaviour {
 	void OnGUI()
 	{ 
 		//GUI.depth = 1;
+		if(show_off == false)
+		{
+			PanelWindowRect.x = left;
+			PanelWindowRect.width = width;
+			PanelWindowRect.height = height;
+		}
 		PanelWindowRect = GUI.Window(0, PanelWindowRect, PanelWindow, "Control Panel");   
 		
 		if(power_notification)
@@ -870,6 +929,8 @@ public class ControlPanel : MonoBehaviour {
 	void FixedUpdate ()
 	{
 		timeV += Time.deltaTime;	
+		if(timeV > 1)
+			show_off = true;
 	}
 	
 	void PowerState (int windowID)
@@ -909,6 +970,20 @@ public class ControlPanel : MonoBehaviour {
 			{
 				//Offset模块显示
 				Offset_Script.Offset();
+			}
+			
+			//System界面，姓名--刘旋，时间--2013-4-24
+			if(SystemMenu)
+			{
+				//System模块显示
+				System_Script.System();
+			}
+			
+			//Message界面，姓名--刘旋，时间--2013-4-24
+			if(MessageMenu)
+			{
+				//Message模块显示
+				Message_Script.Message();
 			}
 			
 			//屏幕 基本固定区域
@@ -1912,7 +1987,9 @@ public class ControlPanel : MonoBehaviour {
 	
 	
 	void Update () {
-		
+		width = Mathf.Lerp(0.1f, 670f, 1.5f*Time.time);
+		height = Mathf.Lerp(0.1f, 650f, 1.5f*Time.time);
+		left = Mathf.Lerp(-300f, 300f, 1.5f*Time.time);
 	}
 	
 	//格式化显示数字
